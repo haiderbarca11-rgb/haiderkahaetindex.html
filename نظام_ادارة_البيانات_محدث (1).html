@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام إدارة البيانات</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2333;
+    --border: #30363d;
+    --accent: #f0883e;
+    --accent2: #3fb950;
+    --accent3: #58a6ff;
+    --danger: #f85149;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --gold: #d4a017;
+  }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 18px 30px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+
+  .header-icon {
+    width: 48px; height: 48px;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 0 20px rgba(240,136,62,0.4);
+  }
+
+  .header-title {
+    font-size: 22px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* TABS */
+  .tabs-container {
+    padding: 20px 30px 0;
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: all 0.2s;
+    position: relative;
+    bottom: -1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .tab-btn:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .tab-btn.active {
+    background: var(--surface);
+    color: var(--accent);
+    border-color: var(--border);
+    border-bottom-color: var(--surface);
+  }
+
+  .tab-badge {
+    background: var(--accent);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  /* TAB CONTENT */
+  .tab-content { display: none; padding: 24px 30px; }
+  .tab-content.active { display: block; }
+
+  /* TOOLBAR */
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .search-box {
+    flex: 1;
+    min-width: 200px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box:focus {
+    border-color: var(--accent3);
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #000;
+  }
+  .btn-primary:hover { background: #e07830; transform: translateY(-1px); }
+
+  .btn-success {
+    background: var(--accent2);
+    color: #000;
+  }
+  .btn-success:hover { background: #2ea043; transform: translateY(-1px); }
+
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+  }
+  .btn-danger:hover { background: #da3633; transform: translateY(-1px); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { background: var(--border); }
+
+  /* TABLE */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead {
+    background: linear-gradient(135deg, #1c2333, #161b22);
+    position: sticky;
+    top: 0;
+  }
+
+  th {
+    padding: 12px 14px;
+    text-align: right;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 13px;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--accent);
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+    max-width: 200px;
+  }
+
+  tr:hover td {
+    background: rgba(240,136,62,0.05);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge-green { background: rgba(63,185,80,0.15); color: var(--accent2); border: 1px solid rgba(63,185,80,0.3); }
+  .badge-red { background: rgba(248,81,73,0.15); color: var(--danger); border: 1px solid rgba(248,81,73,0.3); }
+  .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent3); border: 1px solid rgba(88,166,255,0.3); }
+  .badge-orange { background: rgba(240,136,62,0.15); color: var(--accent); border: 1px solid rgba(240,136,62,0.3); }
+  .badge-gray { background: rgba(139,148,158,0.15); color: var(--muted); border: 1px solid rgba(139,148,158,0.3); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--danger); }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+
+  .form-input {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    direction: rtl;
+  }
+
+  .form-input:focus {
+    border-color: var(--accent3);
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.1);
+  }
+
+  select.form-input {
+    cursor: pointer;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* STATS */
+  .stats-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .stat-icon {
+    font-size: 24px;
+    width: 44px; height: 44px;
+    background: var(--surface);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* actions */
+  .actions { display: flex; gap: 6px; }
+  .action-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+  .action-edit { background: rgba(88,166,255,0.15); color: var(--accent3); }
+  .action-edit:hover { background: var(--accent3); color: #000; }
+  .action-del { background: rgba(248,81,73,0.15); color: var(--danger); }
+  .action-del:hover { background: var(--danger); color: #fff; }
+
+  /* confirm dialog */
+  .confirm-dialog {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 600;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .confirm-dialog.open { display: flex; }
+  .confirm-box {
+    background: var(--surface);
+    border: 1px solid var(--danger);
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 380px;
+    text-align: center;
+  }
+  .confirm-box h3 { color: var(--danger); margin-bottom: 12px; font-size: 18px; }
+  .confirm-box p { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
+  .confirm-btns { display: flex; gap: 12px; justify-content: center; }
+
+  .page-info { color: var(--muted); font-size: 13px; padding: 12px 0; text-align: center; }
+
+  /* pagination */
+  .pagination {
+    display: flex; gap: 6px; justify-content: center; margin-top: 16px; flex-wrap: wrap;
+  }
+  .page-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    transition: all 0.15s;
+  }
+  .page-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+  .page-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+  .page-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state p { font-size: 16px; }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--accent2);
+    color: #000;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 14px;
+    z-index: 999;
+    transition: transform 0.3s;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--danger); color: #fff; }
+
+  /* Save button */
+  .save-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #1565C0, #1976D2);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 6px 8px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(21,101,192,0.3);
+  }
+  .save-btn:hover {
+    background: linear-gradient(135deg, #0D47A1, #1565C0);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(21,101,192,0.5);
+  }
+  .save-btn:active { transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    .save-btn { padding: 7px 12px; font-size: 13px; }
+  }
+
+  /* WhatsApp button */
+  .btn-wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #25D366;
+    color: #fff;
+    border-radius: 8px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+  .btn-wa:hover {
+    background: #1ebe5d;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37,211,102,0.4);
+  }
+
+  /* ===== MOBILE RESPONSIVE ===== */
+  @media (max-width: 768px) {
+
+    /* Header */
+    .header {
+      padding: 12px 16px;
+      gap: 10px;
+    }
+    .header-icon {
+      width: 38px; height: 38px;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .header-title { font-size: 16px; }
+    .header-sub { font-size: 11px; display: none; }
+
+    /* Tabs - scrollable horizontally */
+    .tabs-container {
+      padding: 10px 0 0;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex-wrap: nowrap;
+      border-bottom: 1px solid var(--border);
+    }
+    .tabs-container::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      padding: 10px 14px;
+      font-size: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      gap: 5px;
+    }
+    .tab-badge { font-size: 10px; padding: 1px 5px; }
+
+    /* Tab content */
+    .tab-content { padding: 14px 12px; }
+
+    /* Stats row - 2 per row on mobile */
+    .stats-row {
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .stat-card {
+      min-width: calc(50% - 5px);
+      padding: 10px 12px;
+      gap: 8px;
+    }
+    .stat-icon { width: 36px; height: 36px; font-size: 18px; }
+    .stat-num { font-size: 18px; }
+    .stat-label { font-size: 11px; }
+
+    /* Toolbar */
+    .toolbar {
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .search-box {
+      min-width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+    .btn {
+      padding: 9px 14px;
+      font-size: 13px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    /* Table - horizontal scroll */
+    .table-wrapper {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 8px;
+    }
+    table { font-size: 12px; min-width: 500px; }
+    th { padding: 10px 10px; font-size: 12px; }
+    td { padding: 9px 10px; max-width: 140px; }
+
+    /* Actions buttons smaller */
+    .action-btn { padding: 5px 8px; font-size: 12px; }
+
+    /* Modal full screen on mobile */
+    .modal {
+      width: 96%;
+      padding: 18px 16px;
+      max-height: 92vh;
+      border-radius: 12px;
+    }
+    .modal-title { font-size: 15px; }
+    .form-grid { grid-template-columns: 1fr; gap: 12px; }
+    .form-group.full { grid-column: 1; }
+    .form-input { font-size: 14px; padding: 10px 12px; }
+    .modal-footer { flex-direction: column; gap: 8px; }
+    .modal-footer .btn { width: 100%; justify-content: center; }
+
+    /* Confirm dialog */
+    .confirm-box { width: 90%; padding: 18px; }
+    .confirm-box h3 { font-size: 16px; }
+    .confirm-btns .btn { flex: 1; justify-content: center; }
+
+    /* Pagination */
+    .pagination { gap: 4px; }
+    .page-btn { padding: 6px 10px; font-size: 12px; }
+
+    /* Toast */
+    .toast { width: 90%; text-align: center; font-size: 13px; padding: 10px 16px; }
+
+    /* WhatsApp button on mobile */
+    .btn-wa { padding: 8px 12px; font-size: 13px; }
+
+    /* Tab 4 contact table - make phone column not too wide */
+    #table4 { min-width: 320px; }
+  }
+
+  @media (max-width: 400px) {
+    .stat-card { min-width: 100%; }
+    .tab-btn { padding: 8px 10px; font-size: 11px; }
+    .header-title { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-icon">📋</div>
+  <div>
+    <div class="header-title">نظام إدارة البيانات</div>
+    <div class="header-sub">امر اداري / تنسيب عقد | تغيير التنسيب | الحذف والاستبدال</div>
+  </div>
+</div>
+
+<div class="tabs-container" style="position:relative;">
+  <button class="tab-btn active" onclick="switchTab(1)">
+    📁 امر اداري / تنسيب عقد
+    <span class="tab-badge" id="badge1">0</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab(2)">
+    🔄 تغيير التنسيب
+    <span class="tab-badge" id="badge2">0</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab(3)">
+    🗑️ الحذف والاستبدال
+    <span class="tab-badge" id="badge3">0</span>
+  </button>
+  <button class="tab-btn" onclick="switchTab(4)">
+    💬 تواصل
+    <span class="tab-badge" id="badge4">0</span>
+  </button>
+</div>
+
+<!-- TAB 1 -->
+<div class="tab-content active" id="tab1">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div>
+        <div class="stat-num" id="t1-total">0</div>
+        <div class="stat-label">إجمالي السجلات</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div>
+        <div class="stat-num" id="t1-mote">0</div>
+        <div class="stat-label">متفاعل</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div>
+        <div class="stat-num" id="t1-search-count">0</div>
+        <div class="stat-label">نتائج البحث</div>
+      </div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <input type="text" class="search-box" id="search1" placeholder="🔍 ابحث بالاسم أو مكان العمل أو الشهادة..." oninput="filterTable(1)">
+    <button class="btn btn-primary" onclick="openAddModal(1)">➕ إضافة سجل</button>
+    <button class="btn btn-secondary" onclick="exportCSV(1)">📥 تصدير</button>
+    <button class="save-btn" id="save-btn-1" onclick="saveToStorage()" style="display:none;" title="حفظ البيانات">💾 حفظ</button>
+    <span id="last-saved-1" class="last-saved-label" style="font-size:11px;color:#8b949e;align-self:center;white-space:nowrap;display:none;"></span>
+  </div>
+  <div class="table-wrapper">
+    <table id="table1">
+      <thead>
+        <tr>
+          <th>ت</th>
+          <th>الاسم الرباعي واللقب</th>
+          <th>الشهادة</th>
+          <th>العنوان الوظيفي</th>
+          <th>مكان العمل</th>
+          <th>رقم الهاتف</th>
+          <th>السرية السابقة</th>
+          <th>الفصيل السابق</th>
+          <th>السرية الحالية</th>
+          <th>متفاعل</th>
+          <th>عدد الاسرة</th>
+          <th>مستفيد في الحركة</th>
+          <th>المعرف</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="tbody1"></tbody>
+    </table>
+  </div>
+  <div class="page-info" id="pageinfo1"></div>
+  <div class="pagination" id="pages1"></div>
+</div>
+
+<!-- TAB 2 -->
+<div class="tab-content" id="tab2">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🏫</div>
+      <div>
+        <div class="stat-num" id="t2-total">0</div>
+        <div class="stat-label">إجمالي السجلات</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div>
+        <div class="stat-num" id="t2-search-count">0</div>
+        <div class="stat-label">نتائج البحث</div>
+      </div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <input type="text" class="search-box" id="search2" placeholder="🔍 ابحث بالاسم أو المدرسة..." oninput="filterTable(2)">
+    <button class="btn btn-primary" onclick="openAddModal(2)">➕ إضافة سجل</button>
+    <button class="btn btn-secondary" onclick="exportCSV(2)">📥 تصدير</button>
+    <button class="save-btn" id="save-btn-2" onclick="saveToStorage()" style="display:none;" title="حفظ البيانات">💾 حفظ</button>
+    <span id="last-saved-2" class="last-saved-label" style="font-size:11px;color:#8b949e;align-self:center;white-space:nowrap;display:none;"></span>
+  </div>
+  <div class="table-wrapper">
+    <table id="table2">
+      <thead>
+        <tr>
+          <th>ت</th>
+          <th>الاسم الرباعي واللقب</th>
+          <th>اسم المدرسة الجديدة</th>
+          <th>التحصيل الدراسي</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="tbody2"></tbody>
+    </table>
+  </div>
+  <div class="page-info" id="pageinfo2"></div>
+  <div class="pagination" id="pages2"></div>
+</div>
+
+<!-- TAB 3 -->
+<div class="tab-content" id="tab3">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">🔄</div>
+      <div>
+        <div class="stat-num" id="t3-total">0</div>
+        <div class="stat-label">إجمالي السجلات</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div>
+        <div class="stat-num" id="t3-search-count">0</div>
+        <div class="stat-label">نتائج البحث</div>
+      </div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <input type="text" class="search-box" id="search3" placeholder="🔍 ابحث بالاسم أو القضاء أو الشهادة..." oninput="filterTable(3)">
+    <button class="btn btn-primary" onclick="openAddModal(3)">➕ إضافة سجل</button>
+    <button class="btn btn-secondary" onclick="exportCSV(3)">📥 تصدير</button>
+    <button class="save-btn" id="save-btn-3" onclick="saveToStorage()" style="display:none;" title="حفظ البيانات">💾 حفظ</button>
+    <span id="last-saved-3" class="last-saved-label" style="font-size:11px;color:#8b949e;align-self:center;white-space:nowrap;display:none;"></span>
+  </div>
+  <div class="table-wrapper">
+    <table id="table3">
+      <thead>
+        <tr>
+          <th>ت</th>
+          <th>الشخص المراد استبداله</th>
+          <th>الشخص الجديد</th>
+          <th>اسم الام</th>
+          <th>الجنس</th>
+          <th>التولد</th>
+          <th>الشهادة</th>
+          <th>القضاء</th>
+          <th>الناحية</th>
+          <th>المنطقة</th>
+          <th>رقم البطاقة</th>
+          <th>الحالة الزوجية</th>
+          <th>اسم الزوجة</th>
+          <th>رقم الهاتف</th>
+          <th>الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody id="tbody3"></tbody>
+    </table>
+  </div>
+  <div class="page-info" id="pageinfo3"></div>
+  <div class="pagination" id="pages3"></div>
+</div>
+
+<!-- TAB 4 - تواصل -->
+<div class="tab-content" id="tab4">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon">👥</div>
+      <div>
+        <div class="stat-num" id="t4-total">0</div>
+        <div class="stat-label">إجمالي السجلات</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📞</div>
+      <div>
+        <div class="stat-num" id="t4-with-phone">0</div>
+        <div class="stat-label">لديهم رقم هاتف</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📊</div>
+      <div>
+        <div class="stat-num" id="t4-search-count">0</div>
+        <div class="stat-label">نتائج البحث</div>
+      </div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <input type="text" class="search-box" id="search4" placeholder="🔍 ابحث بالاسم أو رقم الهاتف..." oninput="filterTable4()">
+  </div>
+  <div class="table-wrapper">
+    <table id="table4">
+      <thead>
+        <tr>
+          <th>ت</th>
+          <th>الاسم الرباعي واللقب</th>
+          <th>رقم الهاتف</th>
+          <th>تواصل</th>
+        </tr>
+      </thead>
+      <tbody id="tbody4"></tbody>
+    </table>
+  </div>
+  <div class="page-info" id="pageinfo4"></div>
+  <div class="pagination" id="pages4"></div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal1">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="m1-title">إضافة سجل جديد</div>
+      <button class="modal-close" onclick="closeModal(1)">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">الاسم الرباعي واللقب *</label><input class="form-input" id="m1-name" placeholder="أدخل الاسم الكامل"></div>
+      <div class="form-group"><label class="form-label">الشهادة</label>
+        <select class="form-input" id="m1-cert">
+          <option value="">اختر</option>
+          <option>ابتدائية</option><option>متوسطة</option><option>اعدادية</option>
+          <option>دبلوم</option><option>بكلوريوس</option><option>ماجستير</option><option>يقرا ويكتب</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">العنوان الوظيفي</label><input class="form-input" id="m1-title2" placeholder="العنوان الوظيفي"></div>
+      <div class="form-group"><label class="form-label">مكان العمل</label><input class="form-input" id="m1-work" placeholder="مكان العمل"></div>
+      <div class="form-group"><label class="form-label">رقم الهاتف</label><input class="form-input" id="m1-phone" placeholder="07xxxxxxxxx" type="tel"></div>
+      <div class="form-group"><label class="form-label">السرية السابقة</label><input class="form-input" id="m1-oldsariya" placeholder="اسم السرية السابقة"></div>
+      <div class="form-group"><label class="form-label">الفصيل السابق</label><input class="form-input" id="m1-oldfaseel" placeholder="اسم الفصيل السابق"></div>
+      <div class="form-group"><label class="form-label">السرية الحالية</label><input class="form-input" id="m1-newsariya" placeholder="اسم السرية الحالية"></div>
+      <div class="form-group"><label class="form-label">متفاعل</label>
+        <select class="form-input" id="m1-interact">
+          <option value="">اختر</option>
+          <option>متفاعل</option><option>غير متفاعل</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">عدد افراد الاسرة</label><input class="form-input" id="m1-family" type="number" placeholder="0"></div>
+      <div class="form-group"><label class="form-label">افراد موظفين</label><input class="form-input" id="m1-emp" placeholder="لا يوجد"></div>
+      <div class="form-group"><label class="form-label">الدائرة</label><input class="form-input" id="m1-dept" placeholder="اسم الدائرة"></div>
+      <div class="form-group"><label class="form-label">مستفيد في الحركة</label>
+        <select class="form-input" id="m1-benef">
+          <option value="لا">لا</option><option value="نعم">نعم</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">اسم المستفيد</label><input class="form-input" id="m1-benefname" placeholder="اسم المستفيد إن وجد"></div>
+      <div class="form-group full"><label class="form-label">المعرف</label><input class="form-input" id="m1-ref" placeholder="معلومات إضافية"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(1)">إلغاء</button>
+      <button class="btn btn-success" onclick="saveRecord(1)">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal2">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="m2-title">إضافة سجل جديد</div>
+      <button class="modal-close" onclick="closeModal(2)">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">الاسم الرباعي واللقب *</label><input class="form-input" id="m2-name" placeholder="أدخل الاسم الكامل"></div>
+      <div class="form-group"><label class="form-label">اسم المدرسة الجديدة</label><input class="form-input" id="m2-school" placeholder="اسم المدرسة"></div>
+      <div class="form-group"><label class="form-label">التحصيل الدراسي</label>
+        <select class="form-input" id="m2-edu">
+          <option value="">اختر</option>
+          <option>ابتدائية</option><option>متوسطة</option><option>اعدادية</option>
+          <option>دبلوم</option><option>بكلوريوس</option><option>يقرا ويكتب</option>
+          <option>اعدادية مهني</option><option>دبلوم فني</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(2)">إلغاء</button>
+      <button class="btn btn-success" onclick="saveRecord(2)">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal3">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="m3-title">إضافة سجل جديد</div>
+      <button class="modal-close" onclick="closeModal(3)">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="form-group full"><label class="form-label">الشخص المراد استبداله *</label><input class="form-input" id="m3-old" placeholder="الاسم الكامل"></div>
+      <div class="form-group full"><label class="form-label">الشخص الجديد *</label><input class="form-input" id="m3-new" placeholder="الاسم الكامل"></div>
+      <div class="form-group"><label class="form-label">اسم الام</label><input class="form-input" id="m3-mom" placeholder="اسم الام"></div>
+      <div class="form-group"><label class="form-label">الجنس</label>
+        <select class="form-input" id="m3-gender"><option>ذكر</option><option>انثى</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">التولد</label><input class="form-input" id="m3-born" type="number" placeholder="1990"></div>
+      <div class="form-group"><label class="form-label">الشهادة</label>
+        <select class="form-input" id="m3-cert">
+          <option value="">اختر</option>
+          <option>ابتدائية</option><option>متوسطة</option><option>اعدادية</option>
+          <option>دبلوم</option><option>بكلوريوس</option><option>يقرا ويكتب</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">الاختصاص</label><input class="form-input" id="m3-spec" placeholder="الاختصاص"></div>
+      <div class="form-group"><label class="form-label">الاختصاص الدقيق</label><input class="form-input" id="m3-specx" placeholder="الاختصاص الدقيق"></div>
+      <div class="form-group"><label class="form-label">القضاء</label><input class="form-input" id="m3-qada" placeholder="القضاء"></div>
+      <div class="form-group"><label class="form-label">الناحية</label><input class="form-input" id="m3-nahia" placeholder="الناحية"></div>
+      <div class="form-group"><label class="form-label">المنطقة</label><input class="form-input" id="m3-area" placeholder="المنطقة"></div>
+      <div class="form-group"><label class="form-label">رقم البطاقة الوطنية</label><input class="form-input" id="m3-nid" placeholder="رقم البطاقة"></div>
+      <div class="form-group"><label class="form-label">الحالة الزوجية</label>
+        <select class="form-input" id="m3-marital"><option>اعزب</option><option>متزوج</option><option>مطلق</option><option>ارمل</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">اسم الزوجة</label><input class="form-input" id="m3-wife" placeholder="اسم الزوجة"></div>
+      <div class="form-group"><label class="form-label">رقم الهاتف</label><input class="form-input" id="m3-phone" placeholder="07xxxxxxxxx"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal(3)">إلغاء</button>
+      <button class="btn btn-success" onclick="saveRecord(3)">💾 حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- DUPLICATE WARNING DIALOG -->
+<div class="confirm-dialog" id="dupeDlg">
+  <div class="confirm-box" style="max-width:520px;border-color:#f0883e;border-width:2px">
+    <div style="font-size:32px;margin-bottom:8px">⚠️</div>
+    <h3 style="color:#f0883e;font-size:20px;margin-bottom:6px">تحذير: بيانات مشابهة موجودة!</h3>
+    <p style="color:#8b949e;font-size:13px;margin-bottom:14px">تم العثور على سجلات تحتوي على اسم مشابه أو رقم هاتف متطابق:</p>
+    <div id="dupeList" style="max-height:260px;overflow-y:auto;margin-bottom:14px;text-align:right;padding-left:2px"></div>
+    <div style="background:rgba(240,136,62,0.08);border:1px solid rgba(240,136,62,0.3);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:13px;color:#f0883e;text-align:right">
+      💡 تأكد من أن هذا ليس سجلاً مكرراً قبل الإضافة
+    </div>
+    <div class="confirm-btns">
+      <button class="btn btn-danger" onclick="document.getElementById('dupeDlg').classList.remove('open')">✕ إلغاء</button>
+      <button class="btn btn-primary" id="dupeConfirmBtn">➕ إضافة على أي حال</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-dialog" id="confirmDlg">
+  <div class="confirm-box">
+    <h3>⚠️ تأكيد الحذف</h3>
+    <p>هل أنت متأكد من حذف هذا السجل؟ لا يمكن التراجع عن هذا الإجراء.</p>
+    <div class="confirm-btns">
+      <button class="btn btn-secondary" onclick="closeConfirm()">إلغاء</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">🗑️ حذف</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const PAGE_SIZE = 30;
+let tabs = [null, null, null, null];
+let filtered = [null, null, null, null];
+let pages = [null, 1, 1, 1];
+let editIdx = [null, null, null, null];
+let deleteTarget = null;
+let deleteTab = null;
+
+// INITIAL DATA
+tabs[1] = [{"ت": "1", "الاسم الرباعي واللقب": "كريم نعيم كريم كحيوش الخفاجي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7865056023", "السرية السابقة": "الأولى", "الفصيل السابق": "الأول", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "2", "الاسم الرباعي واللقب": "محمد باقر علي شناوه الحميداوي", "الشهادة": "دبلوم", "العنوان الوظيفي": "معلم خامس", "مكان العمل": "جوهرة الرافدين", "رقم الهاتف": "7742134750", "السرية السابقة": "الخامسة", "الفصيل السابق": "الأول", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "نعم", "اسم المستفيد": "علي شناوة", "المعرف": ""}, {"ت": "3", "الاسم الرباعي واللقب": "مصطفى عبد مزعل عبدالرحمن  معارضة", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7747295109", "السرية السابقة": "الثالثة", "الفصيل السابق": "", "السرية الحالية": "مالك الاشتر", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "4", "الاسم الرباعي واللقب": "محمد داود سلمان محسن العابدي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7712696423", "السرية السابقة": "الخامسة", "الفصيل السابق": "الثاني", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "9", "افراد موظفين": "ضياء داود", "الدائرة": "الصحة", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "5", "الاسم الرباعي واللقب": "حازم ماجد عباس هادي القرقولي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7730312115", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "ماجد عباس", "الدائرة": "شرطة الزبير", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "عين عن طريق مشتاق طالب (أبو بنين)"}, {"ت": "6", "الاسم الرباعي واللقب": "كاظم سمير كاظم عليوي الركابي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7847751522", "السرية السابقة": "الأولى", "الفصيل السابق": "الأول", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "نعم", "اسم المستفيد": "علي سمير", "المعرف": ""}, {"ت": "7", "الاسم الرباعي واللقب": "محمد المقداد محمد كامل لعيبي", "الشهادة": "اعدادية", "العنوان الوظيفي": "كاتب", "مكان العمل": "أصحاب الحسين", "رقم الهاتف": "7707077338", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "نعم", "الدائرة": "الاب/الام", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "8", "الاسم الرباعي واللقب": "حيدر عدي شلال جهاد العبدالله", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7732028468", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "2", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "9", "الاسم الرباعي واللقب": "رائد مسلم عبدالامام حسين الحلفي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7729309786", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "21", "افراد موظفين": "قاسم مسلم", "الدائرة": "الزراعة", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "10", "الاسم الرباعي واللقب": "محمد شاكر حطاب مسلم السويعدي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7722130242", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "11", "الاسم الرباعي واللقب": "جسام شياع جهاد عبدالله الموسوي ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7710850121", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "12", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "12", "الاسم الرباعي واللقب": "ازهر سالم حذية بايش السعيدي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7703264276", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "13", "الاسم الرباعي واللقب": "محمد عدنان عبدالله عتيق التميمي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة وسام العراق", "رقم الهاتف": "7716582380", "السرية السابقة": "لا يوجد", "الفصيل السابق": "لا يوجد", "السرية الحالية": "لا يوجد", "الفصيل الحالي": "لا يوجد", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "عن طريق احمد الملا"}, {"ت": "14", "الاسم الرباعي واللقب": "رضا حامد عبدالصمد حبيب المطوري", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7722038614", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "الاب", "الدائرة": "النفط", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "15", "الاسم الرباعي واللقب": "علي نائل علي عنيد  ال طربوش", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7760579400", "السرية السابقة": "الرابعة", "الفصيل السابق": "الثاني", "السرية الحالية": "الشهيد عماد الصرايفي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "أبو كيان عدي"}, {"ت": "16", "الاسم الرباعي واللقب": "مهدي حسين خيرالله محمد العلياوي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7736023886", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "17", "الاسم الرباعي واللقب": "سعد فوزي كريم منصور عاتي", "الشهادة": "دبلوم", "العنوان الوظيفي": "معلم خامس", "مكان العمل": "الشفاء", "رقم الهاتف": "7712696434", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "18", "الاسم الرباعي واللقب": "مراد ضياء عبدالرزاق خضير المياحي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7734595521", "السرية السابقة": "لا يوجد", "الفصيل السابق": "لا يوجد", "السرية الحالية": "الشهيد عماد الصرايفي", "الفصيل الحالي": "لا يوجد", "متفاعل": "متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "ابن ضياء حارس مرتضى زغير"}, {"ت": "19", "الاسم الرباعي واللقب": "علي ماجد حميد عبدعلي الحلفي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة امنة بنت وهب", "رقم الهاتف": "7822114022", "السرية السابقة": "الرابعة", "الفصيل السابق": "الرابع", "السرية الحالية": "الشهيد عماد الصرايفي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "نعم", "اسم المستفيد": "جمال / عقد", "المعرف": ""}, {"ت": "20", "الاسم الرباعي واللقب": "محمد قاسم محمد طعمة التميمي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7808992652", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "الاب", "الدائرة": "البلدية", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "21", "الاسم الرباعي واللقب": "علي باسم طعمة جياد الخفاجي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7773820445", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "رحاب باسم", "الدائرة": "تربية", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "22", "الاسم الرباعي واللقب": "جميل صفر نوروز ابنيه الامي", "الشهادة": "دبلوم", "العنوان الوظيفي": "معلم خامس", "مكان العمل": "الجبيلة للتعليم الأساس", "رقم الهاتف": "7747539216", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "الزوجة", "الدائرة": "التربية", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "23", "الاسم الرباعي واللقب": "كاظم عاتي بجاي جناح السعيدي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7709007291", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "24", "الاسم الرباعي واللقب": "علي رحيم حرب صالح المالكي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7735247907", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "12", "افراد موظفين": "الاب", "الدائرة": "شرطة النفط", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "25", "الاسم الرباعي واللقب": "خليل كامل صفر نوروز اللامي", "الشهادة": "اعدادية", "العنوان الوظيفي": "كاتب", "مكان العمل": "الاشعاع", "رقم الهاتف": "7732779084", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "11", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "26", "الاسم الرباعي واللقب": "مشتاق عبدالامير ناصر ثجيل الزبيدي", "الشهادة": "اعدادية", "العنوان الوظيفي": "كاتب", "مكان العمل": "قسم الشؤون القانونية", "رقم الهاتف": "7734668208", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "9", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "27", "الاسم الرباعي واللقب": "احمد حسن مطلك محمد السعيدي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7725894926", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "فصيل حسن جواد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "28", "الاسم الرباعي واللقب": "مسلم حربي عبدالكاظم جحيل الرماح", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7770954715", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "12", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "29", "الاسم الرباعي واللقب": "علاء نغيمش راشد طعمة التميمي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "770851755", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "فصيل حسن جواد", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "9", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "30", "الاسم الرباعي واللقب": "محمد حميد عبدالرزاق الحمود", "الشهادة": "بكالوريوس", "العنوان الوظيفي": "معلم جامعي رابع", "مكان العمل": "الحشد الشعبي", "رقم الهاتف": "7709034196", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "التدخل السريع", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "11", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "31", "الاسم الرباعي واللقب": "مرتضى عبدالله حميد عباس الفضلي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7732907360", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "32", "الاسم الرباعي واللقب": "تقي الدين سعد عزيز ثجيل التميمي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة الذرة", "رقم الهاتف": "7744929091", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "33", "الاسم الرباعي واللقب": "مرتضى كاظم حسين  علي المنصوري", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7710812185", "السرية السابقة": "الرابعة", "الفصيل السابق": "", "السرية الحالية": "الشهيد عماد الصرايفي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "3", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "34", "الاسم الرباعي واللقب": "محسن قصي عبدالرزاق خليل المنصوري", "الشهادة": "اعدادية", "العنوان الوظيفي": "كاتب", "مكان العمل": "المائدة", "رقم الهاتف": "7712570604", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "الاب", "الدائرة": "شركة الحفر", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "35", "الاسم الرباعي واللقب": "حسن جواد كاظم كاطع المناصير", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7703229274", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "فصيل حسن جواد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "الاب", "الدائرة": "البلدية", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "الملا احمد"}, {"ت": "36", "الاسم الرباعي واللقب": " علي دخيل يوسف حمود الركابي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7714973971", "السرية السابقة": "الثانية", "الفصيل السابق": "", "السرية الحالية": "فصيل حي الشهداء", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "37", "الاسم الرباعي واللقب": "سجاد محسن شري نايف الصالحي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7770969400", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "فصيل حسن جواد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "38", "الاسم الرباعي واللقب": "مهند حاتم مطشر لطيف الطائي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7745188836", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد عماد الصرايفي", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "14", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "39", "الاسم الرباعي واللقب": "حيدر علي حمد جالوب الشويلي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7706765921", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "40", "الاسم الرباعي واللقب": "حسن علي حمد جالوب الشويلي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7722766736", "السرية السابقة": "الولى", "الفصيل السابق": "", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "41", "الاسم الرباعي واللقب": "حيدر  شريف عداي حبيب عويس", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7866548862", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "مالك الاشتر", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "42", "الاسم الرباعي واللقب": "امين احمد عبدالزهرة نعمة الغزالي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم الت", "رقم الهاتف": "7729485342", "السرية السابقة": "الثانية", "الفصيل السابق": "", "السرية الحالية": "فصيل حي الشهداء", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "15", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "نعم", "اسم المستفيد": "الأخ / الاب حشد", "المعرف": ""}, {"ت": "43", "الاسم الرباعي واللقب": "حيدر نصيف جاسم لفته المحمداوي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7716578424", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "فصيل حي العسكري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "44", "الاسم الرباعي واللقب": "حسين سلمان جفات دفار الصرايفي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7873517641", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "علاقات حجي حمزة", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": ""}, {"ت": "45", "الاسم الرباعي واللقب": "مرتضى جواد كاظم كاطع المناصير", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7884990898", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "فصيل حسن جواد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "الاب", "الدائرة": "البلدية", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "الملا احمد"}, {"ت": "46", "الاسم الرباعي واللقب": "حيدر شريف حميد حسون البطاط", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7804139078", "السرية السابقة": "لا يوجد", "الفصيل السابق": "", "السرية الحالية": "الحاج باقر البوبصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "9", "افراد موظفين": "الأخ", "الدائرة": "الصحة", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "واثق (حيدر المالكي علاقات)"}, {"ت": "47", "الاسم الرباعي واللقب": "عبدالله حنش هاشم حمود العامري", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7815775651", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "فصيل حسن جواد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "3", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "حسن جواد"}, {"ت": "48", "الاسم الرباعي واللقب": "منتظر شاكر غالب شمهود المحمود", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7740401550", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "3", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "محمد المقداد"}, {"ت": "49", "الاسم الرباعي واللقب": "كرار حيدر علوان عبد حرب الصوفي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "ثانوية الظلال", "رقم الهاتف": "7718311396", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "أبو سيف", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "الملا احمد"}, {"ت": "50", "الاسم الرباعي واللقب": "حيدر عبدالمنعم حيدر جواد السبيعي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة البحتري", "رقم الهاتف": "7722015189", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "أبو سيف", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "الملا احمد"}, {"ت": "51", "الاسم الرباعي واللقب": "عبدالله محمد طالب كاظم الهاشم", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7730102404", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "محمد المقداد"}, {"ت": "52", "الاسم الرباعي واللقب": "حمود فاضل عبدالعباس جوار الصرايفي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7722925741", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "مع مرتضى زغير", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "18", "افراد موظفين": "الأخ", "الدائرة": "البلدية", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "علي حامد حارس الشخصي لمرتضى زغير"}, {"ت": "53", "الاسم الرباعي واللقب": "عباس عادل علي راضي البغلاني", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7705532706", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "امر فصيل احسان مالح"}, {"ت": "54", "الاسم الرباعي واللقب": "منى عباس بري", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7703253844", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سلام الدريعي"}, {"ت": "55", "الاسم الرباعي واللقب": "محمد جبار جالي عبيد الشريفي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7730202209", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "فصيل أبو سيف", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "سيد وليد (حشد)"}, {"ت": "56", "الاسم الرباعي واللقب": "حسين كريم عباس عبدالله الصالحي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7770919601", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "مع مرتضى زغير", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "علي حامد حارس الشخصي لمرتضى زغير"}, {"ت": "57", "الاسم الرباعي واللقب": "مرتضى اثير عدنان حبيب الفردان", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7765039972", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "مع مرتضى زغير", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "علي حامد حارس الشخصي لمرتضى زغير"}, {"ت": "58", "الاسم الرباعي واللقب": "عبدالكريم احمد فالح حسن المايدي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7760588511", "السرية السابقة": "الخامسة", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "عبدالله نجم زغير"}, {"ت": "59", "الاسم الرباعي واللقب": "علي صفاء مجيد حميد المنصوري", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7711589575", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "الشهيد أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "فهمي الإعلامي"}, {"ت": "60", "الاسم الرباعي واللقب": "حلا عبدالنبي صالح عبود ", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتبه", "مكان العمل": "", "رقم الهاتف": "7705732027", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سلام الدريعي"}, {"ت": "61", "الاسم الرباعي واللقب": "رخيم جاسم عجرم  كاظم ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية زبير ", "رقم الهاتف": "7737302553", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "متفاعل ام غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "أبو سيف"}, {"ت": "62", "الاسم الرباعي واللقب": "علي كتاب جياد سلمان", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية زبير ", "رقم الهاتف": "7746316212", "السرية السابقة": "الأولى", "الفصيل السابق": "الأول", "السرية الحالية": "أبو طيبة ", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "ابوطيبة"}, {"ت": "63", "الاسم الرباعي واللقب": "حسين مهدي جالي عبيد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية زبير ", "رقم الهاتف": "7729992974", "السرية السابقة": "الثانية", "الفصيل السابق": "الثاني", "السرية الحالية": "أبو سيف", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "ابوسيف"}, {"ت": "64", "الاسم الرباعي واللقب": "حسين علي غالي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية زبير ", "رقم الهاتف": "7725440468", "السرية السابقة": "الثانية", "الفصيل السابق": "الثاني", "السرية الحالية": "ابوسيف", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "أبو سيف"}, {"ت": "65", "الاسم الرباعي واللقب": "مصطفى محمد ناظم ", "الشهادة": "اعدادية", "العنوان الوظيفي": "كاتب", "مكان العمل": "قسم شؤن القانونية", "رقم الهاتف": "7704961196", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "محمد المقداد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "لا يوجد", "الدائرة": "لا يوجد", "مستفيد في الحركة": "لا", "اسم المستفيد": "لا يوجد", "المعرف": "محمد المقداد"}, {"ت": "66", "الاسم الرباعي واللقب": "احمد ياسر خيال نبات ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7706757129", "السرية السابقة": "الخامسة ", "الفصيل السابق": "ثاني ", "السرية الحالية": "حي العسكري ", "الفصيل الحالي": "حي العسكري ", "متفاعل": "متفاعل", "عدد افراد الاسرة": "1", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "67", "الاسم الرباعي واللقب": "خسن كريم حميدي ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7772604156", "السرية السابقة": "ثامنه", "الفصيل السابق": "ثاني ", "السرية الحالية": "حي الهادي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "68", "الاسم الرباعي واللقب": "حيدر حاتم مطشر", "الشهادة": "بكالوريوس", "العنوان الوظيفي": "مدرس رابع", "مكان العمل": "اعدادية البصرة", "رقم الهاتف": "7717837629", "السرية السابقة": "الخامسة ", "الفصيل السابق": "ثاني ", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "3", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "69", "الاسم الرباعي واللقب": "مصطفى ناصر عبد الرضا", "الشهادة": "متوسطة ", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة الرشيد", "رقم الهاتف": "7804466481", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "محلة العرب", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "11", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "70", "الاسم الرباعي واللقب": "خيرالله  حنش هاشم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7873494182", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "الدريهمية", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "71", "الاسم الرباعي واللقب": "  منتظر نوري كامل ", "الشهادة": "متوسطة ", "العنوان الوظيفي": "حارس اول ", "مكان العمل": "متوسطة الغدير", "رقم الهاتف": "7710217501", "السرية السابقة": "السابعة", "الفصيل السابق": "الإدارة", "السرية الحالية": "الدريهمية", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "72", "الاسم الرباعي واللقب": "رحيم ستار سبتي مشعان", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7874773518", "السرية السابقة": "الخامسة ", "الفصيل السابق": "الثالثة", "السرية الحالية": "محلة العرب", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "73", "الاسم الرباعي واللقب": "عباس فالح حسن عزيز", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7762559740", "السرية السابقة": "الخامسة ", "الفصيل السابق": "الثانية", "السرية الحالية": "محلة العرب", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "74", "الاسم الرباعي واللقب": "عيسى فاضل عيسى خلف", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7702137564", "السرية السابقة": "الرابعة", "الفصيل السابق": "الأول", "السرية الحالية": "المربد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "75", "الاسم الرباعي واللقب": "حيدر يحيى جعيول", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7708199975", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الضويهرات", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "12", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "76", "الاسم الرباعي واللقب": "فهمي صفاء مجيد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7746307564", "السرية السابقة": "الرابعة", "الفصيل السابق": "الأول", "السرية الحالية": "المربد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "77", "الاسم الرباعي واللقب": "فتاح كاظم كاطع  ثجيل", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7712686097", "السرية السابقة": "السابعة", "الفصيل السابق": "الثانية", "السرية الحالية": "الدريهمية", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "المعرف / حسن جواد"}, {"ت": "78", "الاسم الرباعي واللقب": "عثمان نعيم حسين", "الشهادة": "متوسطة ", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة مصطفى جمال الدين", "رقم الهاتف": "7708221081", "السرية السابقة": "الخامسة ", "الفصيل السابق": "الثالثة", "السرية الحالية": "دور الخطوة", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "2", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "79", "الاسم الرباعي واللقب": "حسين عبد الأمير عبد النبي محمد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7729483910", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "الدريهمية", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "3", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حسن جواد"}, {"ت": "80", "الاسم الرباعي واللقب": "حيدر علي مزهر", "الشهادة": "متوسطة ", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة علي الهادي", "رقم الهاتف": "7817391002", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "محلة العرب", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "10", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "81", "الاسم الرباعي واللقب": "باقر جاسم مهدي عجيل", "الشهادة": "متوسطة ", "العنوان الوظيفي": "حارس اول", "مكان العمل": "اعدادية البسمة", "رقم الهاتف": "7783790666", "السرية السابقة": "السابعة", "الفصيل السابق": "", "السرية الحالية": "الدريهمية", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حسن جواد"}, {"ت": "82", "الاسم الرباعي واللقب": "إبراهيم دايخ إبراهيم عبدالله", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس  ثاني", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7703134467", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "حي العسكري ", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حيدر رزاق"}, {"ت": "83", "الاسم الرباعي واللقب": "حسن محسن دايخ إبراهيم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7733369794", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "حي العسكري ", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "2", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حيدر رزاق"}, {"ت": "84", "الاسم الرباعي واللقب": "ميثم يعقوب يوسف حمود", "الشهادة": "دبلوم", "العنوان الوظيفي": "معلم خامس", "مكان العمل": "الثقيف", "رقم الهاتف": "7707314688", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "دور الضباط", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "9", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "85", "الاسم الرباعي واللقب": "نبيل توفيق كشيش محمد", "الشهادة": "متوسطة ", "العنوان الوظيفي": "حارس اول", "مكان العمل": "اعدادية الشهيد عبد المجيد الماجدي", "رقم الهاتف": "7707329056", "السرية السابقة": "الثانية", "الفصيل السابق": "", "السرية الحالية": "الجمهورية", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "86", "الاسم الرباعي واللقب": "محمد ياسر خيال نبات", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7764535264", "السرية السابقة": "الخامسة ", "الفصيل السابق": "", "السرية الحالية": "حي العسكري ", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "87", "الاسم الرباعي واللقب": "محد فاضل  كاطع", "الشهادة": "اعدادية ", "العنوان الوظيفي": "كاتب", "مكان العمل": "شعبة الصادر والوارد والطبع", "رقم الهاتف": "7717765521", "السرية السابقة": "السادسة ", "الفصيل السابق": "الثانية", "السرية الحالية": "المربد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "88", "الاسم الرباعي واللقب": "خالد حسام كاطع هندال", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7777901742", "السرية السابقة": "السادسة ", "الفصيل السابق": "", "السرية الحالية": "المربد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "89", "الاسم الرباعي واللقب": "حسن هاشم  جاسم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7729100588", "السرية السابقة": "الأولى", "الفصيل السابق": "الخامس", "السرية الحالية": "دور الضباط", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "90", "الاسم الرباعي واللقب": "كرار محمد رحيمة  حمود", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7710855548", "السرية السابقة": "الثامنة", "الفصيل السابق": "", "السرية الحالية": "الشعيبة", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سعد وادي"}, {"ت": "91", "الاسم الرباعي واللقب": "ثاىر كاظم كشيش خزيم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7742058923", "السرية السابقة": "الثالثة", "الفصيل السابق": "", "السرية الحالية": "حي العسكري ", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "7", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "دحام جاسم"}, {"ت": "92", "الاسم الرباعي واللقب": "طعمة خلف عودة البزوني", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7822962151", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "دور الحطوة", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حسن جواد"}, {"ت": "93", "الاسم الرباعي واللقب": "ماهر صباح جالي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7773816566", "السرية السابقة": "الأولى", "الفصيل السابق": "الأول", "السرية الحالية": "حي العسكري ", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "6", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "أبو طيبة"}, {"ت": "94", "الاسم الرباعي واللقب": "عباس عمار جالي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7733638332", "السرية السابقة": "الأولى", "الفصيل السابق": "", "السرية الحالية": "أبو سيف", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "أبو سيف"}, {"ت": "95", "الاسم الرباعي واللقب": "غيث باسم منذور سالم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7876274340", "السرية السابقة": "التاسعة", "الفصيل السابق": "", "السرية الحالية": "فواد مهدي", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "فواد مهدي"}, {"ت": "96", "الاسم الرباعي واللقب": "حكيم عادل كريم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7825431316", "السرية السابقة": "السادسة", "الفصيل السابق": "", "السرية الحالية": "أبو كوثر الشاوي", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "محمد المقداد"}, {"ت": "97", "الاسم الرباعي واللقب": "مهند حيدر فاضل حسين", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7722927565", "السرية السابقة": "السابعة", "الفصيل السابق": "الثاني", "السرية الحالية": "حسن جواد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "لايوجد", "المعرف": "حسن جواد"}, {"ت": "98", "الاسم الرباعي واللقب": "حسين عبدالله ثجيل كاضم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7722754037", "السرية السابقة": "السابعه", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "لايوجد", "المعرف": "حسن جواد"}, {"ت": "99", "الاسم الرباعي واللقب": "علي حسين علي زباله", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير ", "رقم الهاتف": "7716403666", "السرية السابقة": "الثانية ", "الفصيل السابق": "الأول ", "السرية الحالية": "الشهداء", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "5", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حمزه احمد"}, {"ت": "100", "الاسم الرباعي واللقب": "مرتضى حسن علي داخل الاسدي", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "شعبة حقوق الانسان", "رقم الهاتف": "7830015736", "السرية السابقة": "فصيل الروضان", "الفصيل السابق": "", "السرية الحالية": "الرضوان", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "4", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حسن جواد"}, {"ت": "101", "الاسم الرباعي واللقب": "حسام ستار زامل وثيج", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس", "مكان العمل": "", "رقم الهاتف": "7776055828", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "8", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حماده زغير"}, {"ت": "102", "الاسم الرباعي واللقب": "زين العابدين علي حسين كريم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "", "رقم الهاتف": "7712558916", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الشهيد باقر البصيري", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "103", "الاسم الرباعي واللقب": "ذوالفقار كريم جبر محسن", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7705729598", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "محمد مقداد", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "10", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "محمد مقداد "}, {"ت": "104", "الاسم الرباعي واللقب": "مصطفى زكي حسين محمد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7713201377", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "مرتضى ابوزينب", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "مرتضى ابوزينب"}, {"ت": "105", "الاسم الرباعي واللقب": "بدر عبدالكريم تركي طعيمه", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7736013813", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "مرتضى ابوزينب", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "مرتضى ابوزينب"}, {"ت": "106", "الاسم الرباعي واللقب": "حسين حمود جمعه يزد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7747192185", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حماده زغير"}, {"ت": "107", "الاسم الرباعي واللقب": "سعد صالح صياح مزعل", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7715149795", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "دحام جاسم حاتم", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "دحام جاسم حاتم"}, {"ت": "108", "الاسم الرباعي واللقب": "حيدر ضياء عبدالمجيد ", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "اريحا", "رقم الهاتف": "7703283484", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "109", "الاسم الرباعي واللقب": "فاضل عباس قاسم جوتد", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "الرسالة", "رقم الهاتف": "7702683778", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "110", "الاسم الرباعي واللقب": "عادل جليل مزعل عبيد المالكي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7777915154", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوطيبة"}, {"ت": "111", "الاسم الرباعي واللقب": "علي جابر فجر  محي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7712522340", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الشهيد باقر البصيري", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "112", "الاسم الرباعي واللقب": "راشد علي عيسى قصاب", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "ثانوية الارتقاء", "رقم الهاتف": "7772554642", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوطيبة"}, {"ت": "113", "الاسم الرباعي واللقب": "محمد غازي جادم جمعه", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "77242123658", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الشهيد باقر البصيري", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "114", "الاسم الرباعي واللقب": "شهاب احمد عبدالواحد", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "المستقبل الباهر", "رقم الهاتف": "7734950713", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "دحام جاسم حاتم", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "دحام جاسم حاتم"}, {"ت": "115", "الاسم الرباعي واللقب": "محمد قاسم صنكور غانم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7708370143", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "أبو اديان فصيل الطوارء", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "مرتضى عادل محسن"}, {"ت": "116", "الاسم الرباعي واللقب": "علي عيسى قصاب علي", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "الشهيد اياد علي الغريب", "رقم الهاتف": "7712542154", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوطيبة"}, {"ت": "117", "الاسم الرباعي واللقب": "خالد جميل مكي حمد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7734953443", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوطيبة"}, {"ت": "118", "الاسم الرباعي واللقب": "رعد جاسب بري دبش الزبيدي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "ثانوية الثوار", "رقم الهاتف": "7710512284", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الشهيد عماد الصرايفي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوكيان عدي "}, {"ت": "119", "الاسم الرباعي واللقب": "حسن محمد حسن طوكان", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7763836783", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "فصيل مالك الاشتر", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوسيف الابراهيمي"}, {"ت": "120", "الاسم الرباعي واللقب": "رسول هاشم محمد جابر", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7706192318", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "السرية التاسعه", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ماجد الصرايفي"}, {"ت": "121", "الاسم الرباعي واللقب": "علي جميل ثامر عناد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7726727365", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوسيف الابراهيمي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوسيف الابراهيمي"}, {"ت": "122", "الاسم الرباعي واللقب": "عمر غسان ماجد إبراهيم", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "حبيب بن مظاهر", "رقم الهاتف": "7735731232", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الرضوان", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حسن جواد"}, {"ت": "123", "الاسم الرباعي واللقب": "علي مجيد رسن علي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7838465578", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حماده زغير"}, {"ت": "124", "الاسم الرباعي واللقب": "علي رياض جليل شلال", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة حليمة السعدية", "رقم الهاتف": "7727770296", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الرضوان", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حسن جواد"}, {"ت": "125", "الاسم الرباعي واللقب": "حسين شمخي مهلهل لهمود", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "الشباب", "رقم الهاتف": "7819669081", "السرية السابقة": "السرية 11فصيل 2", "الفصيل السابق": "", "السرية الحالية": "أبوسيف الابراهيمي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوسيف الابراهيمي"}, {"ت": "126", "الاسم الرباعي واللقب": "محمد حسن كاظم جبار", "الشهادة": "اتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7776119982", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "أبو طيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "أبو طيبة"}, {"ت": "127", "الاسم الرباعي واللقب": "لفتة مايود غالب صاحي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7752119006", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "دحام جاسم حاتم", "الفصيل الحالي": "", "متفاعل": "غير فعال", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "دحام جاسم حاتم"}, {"ت": "128", "الاسم الرباعي واللقب": "حسين علي مزهر فجر", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7716314025", "السرية السابقة": "فصيل 8 حسن كريم", "الفصيل السابق": "", "السرية الحالية": "الشهيد باقر البصيري", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "129", "الاسم الرباعي واللقب": "محمد صادق حيدر جعفر طالب", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7808090016", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الشهيد باقر البصيري", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "130", "الاسم الرباعي واللقب": "امين فاخر هاشم لفتة", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7825410988", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "محمد مقداد", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "محمد مقداد "}, {"ت": "131", "الاسم الرباعي واللقب": "عبدالله سعد عبدالجبار جدال", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7750934909", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "أبوسيف الابراهيمي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "132", "الاسم الرباعي واللقب": "صدام موسى حسين علي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7837877413", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": " الفصيل العاشر الشعيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سعد وادي"}, {"ت": "133", "الاسم الرباعي واللقب": "عباس علي ياسين محيسن", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "اعدادية المعقل", "رقم الهاتف": "7832363337", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": " الفصيل العاشر الشعيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سعد وادي"}, {"ت": "134", "الاسم الرباعي واللقب": "علي كاظم صبيح مناحي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7733225557", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": " الفصيل العاشر الشعيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سعد وادي"}, {"ت": "135", "الاسم الرباعي واللقب": "تحسين علوان عنايه نعيمة", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "متوسطة مصطفى جمال الدين", "رقم الهاتف": "7737119255", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": " الفصيل العاشر الشعيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سعد وادي"}, {"ت": "136", "الاسم الرباعي واللقب": "حسن علي ياسين محيسن", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7841222315", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": " الفصيل العاشر الشعيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سعد وادي"}, {"ت": "137", "الاسم الرباعي واللقب": "حيدر شريف عداي حبيب", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7866488562", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "مالك الاشتر", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوسيف الابراهيمي"}, {"ت": "138", "الاسم الرباعي واللقب": "حسن ذجر سالم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثالث", "مكان العمل": "قسم إدارة والتجيزات", "رقم الهاتف": "7807648190", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "فواد مهدي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "فواد مهدي"}, {"ت": "139", "الاسم الرباعي واللقب": "علي بشير جبار قاسم ", "الشهادة": "", "العنوان الوظيفي": "مدرس رابع", "مكان العمل": "متوسطة الغد الأمثل", "رقم الهاتف": "7716429945", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوطيبة", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "مرتضى زغير"}, {"ت": "140", "الاسم الرباعي واللقب": "امير رياض عبد كريم", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7803582353", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "فواد مهدي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "فواد مهدي"}, {"ت": "141", "الاسم الرباعي واللقب": "حيدر شريف عزيز حبيب", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7818532582", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "فواد مهدي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "فواد مهدي"}, {"ت": "142", "الاسم الرباعي واللقب": "حيدر احمد مريح راشد", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7711586064", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "دحام جاسم حاتم", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "دحام جاسم حاتم"}, {"ت": "143", "الاسم الرباعي واللقب": "عباس رياض غانم سعدون", "الشهادة": "بكلوريوس", "العنوان الوظيفي": "معلم جامعي رابع", "مكان العمل": "الصفا", "رقم الهاتف": "7830601644", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "ابوسيف الابراهيمي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "ابوسيف الابراهيمي"}, {"ت": "144", "الاسم الرباعي واللقب": "صباح علي عبد مرهي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7826268375", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "فواد مهدي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "فواد مهدي"}, {"ت": "145", "الاسم الرباعي واللقب": "محمد رائد نجم عبود", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7747175781", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "محمد مقداد", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "محمد مقداد "}, {"ت": "146", "الاسم الرباعي واللقب": "محمد خلف عويد حسين", "الشهادة": "بكلوريوس", "العنوان الوظيفي": "مدرس رابع", "مكان العمل": "ثانوية المتفوقات", "رقم الهاتف": "7721209317", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الشهيد باقر البصيري", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سلام الدريعي"}, {"ت": "147", "الاسم الرباعي واللقب": "مصطفى حمزه قاسم المالكي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "الرؤى", "رقم الهاتف": "7828155785", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "148", "الاسم الرباعي واللقب": "علي خيون جولان تقي", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "بلقيس", "رقم الهاتف": "7730057548", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "دحام جاسم حاتم", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "دحام جاسم حاتم"}, {"ت": "149", "الاسم الرباعي واللقب": "علي عادي نايف مزهر", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير ", "رقم الهاتف": "7715520958", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "باقر البصيري", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد عبدالسلام"}, {"ت": "150", "الاسم الرباعي واللقب": "سلام علي حسن خنجر", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "اعدادية العراق المسائية", "رقم الهاتف": "7703459314", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "أنور  باسم"}, {"ت": "151", "الاسم الرباعي واللقب": "سجاد فاضل جودة", "الشهادة": "دبلوم محاسبة", "العنوان الوظيفي": "معلم خامس", "مكان العمل": "الشهيد أبو كوثر الشاوي", "رقم الهاتف": "7826034244", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "باقر البصيري", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "واثق كريم"}, {"ت": "152", "الاسم الرباعي واللقب": "سجاد رشيد علي الواعة البخاتري", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "فواد رميلة", "رقم الهاتف": "7732360092", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "فواد مهدي رميلة", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "فواد مهدي رميلة"}, {"ت": "153", "الاسم الرباعي واللقب": "طيبة عبدالزهرة جبار هزاع", "الشهادة": "بكالوريوس", "العنوان الوظيفي": "مدرس رابع", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "سلام الدريعي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "سلام الدريعي"}, {"ت": "154", "الاسم الرباعي واللقب": "رياض محمد راضي صخي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7705645411", "السرية السابقة": "الثانية", "الفصيل السابق": "أنور", "السرية الحالية": "أنور ", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "اتور"}, {"ت": "155", "الاسم الرباعي واللقب": "مصطفى جاسم حميد حمزه ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "7742082455", "السرية السابقة": "السادسة", "الفصيل السابق": "محمد مقداد", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "محمد فاضل كاطع"}, {"ت": "156", "الاسم الرباعي واللقب": "مرتضى عصام حاجم بكر", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربية الزبير", "رقم الهاتف": "77081334916", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "مرتضى زغير"}, {"ت": "157", "الاسم الرباعي واللقب": "حسين هادي ياسر حسين", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7855774717", "السرية السابقة": "السريه الثالثه", "الفصيل السابق": "دحام ", "السرية الحالية": "دحام", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "دحام جاسم حاتم"}, {"ت": "158", "الاسم الرباعي واللقب": "حسين منقذ يعقوب يوسف", "الشهادة": "دبلوم", "العنوان الوظيفي": "معلم خامس", "مكان العمل": "الشهيد غانم فرعون", "رقم الهاتف": "7812377758", "السرية السابقة": "السادسة", "الفصيل السابق": "مقداد", "السرية الحالية": "مقداد", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "مقداد"}, {"ت": "159", "الاسم الرباعي واللقب": "علي جبار حسين مياح ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاتي", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7711014899", "السرية السابقة": "السادسة", "الفصيل السابق": "المله", "السرية الحالية": "المله", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "المله"}, {"ت": "160", "الاسم الرباعي واللقب": "علي عبد السلام دنيف مزهر ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7725078977", "السرية السابقة": "الثامنه", "الفصيل السابق": "احمد عبدالسلام", "السرية الحالية": "احمد عبدالسلام", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "احمد عبدالسلام"}, {"ت": "161", "الاسم الرباعي واللقب": "عدي فندي حميد بدر", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7760188868", "السرية السابقة": "الرابعه", "الفصيل السابق": "أبو الأكبر", "السرية الحالية": "أبو الأكبر", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "متفاعل"}, {"ت": "162", "الاسم الرباعي واللقب": "عبدالله فايق عبدالكريم سوادي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس اول", "مكان العمل": "اعداديه البسمه", "رقم الهاتف": "7732360345", "السرية السابقة": "الرابعه", "الفصيل السابق": "أبو الأكبر", "السرية الحالية": "أبو الأكبر", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "أبو الأكبر"}, {"ت": "163", "الاسم الرباعي واللقب": "عبدالكريم ثامر حسن", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني ", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7722926343", "السرية السابقة": "الثانية", "الفصيل السابق": "ابوحمزه", "السرية الحالية": "ابوحمزه", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "أبو حمزه"}, {"ت": "164", "الاسم الرباعي واللقب": "فرحان علي عبد مريهي", "الشهادة": "متوسطة", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7830718910", "السرية السابقة": "العاشره", "الفصيل السابق": "فواد", "السرية الحالية": "فواد", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "فواد"}, {"ت": "165", "الاسم الرباعي واللقب": "عبدالله محمد داود عجيل ", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7750501599", "السرية السابقة": "الثامنه", "الفصيل السابق": "المله", "السرية الحالية": "المله", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "غير متفاعل"}, {"ت": "166", "الاسم الرباعي واللقب": "عباس مصطفى موسى جباره", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "قسم تربيه الزبير ", "رقم الهاتف": "7712505847", "السرية السابقة": "الثامنه", "الفصيل السابق": "المله", "السرية الحالية": "المله", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "غير متفاعل"}, {"ت": "167", "الاسم الرباعي واللقب": "مصطفى خضير عباس الخليفاوي", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "قسم الشوون القانونيه", "رقم الهاتف": "7712116386", "السرية السابقة": "الثامنه", "الفصيل السابق": "المله", "السرية الحالية": "المله", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "متفاعل"}, {"ت": "168", "الاسم الرباعي واللقب": "كرار  جحيل محمد رحيمه", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير", "رقم الهاتف": "7712888417", "السرية السابقة": "الثايه", "الفصيل السابق": "أبو حمزه", "السرية الحالية": "أبو حمزه الشهداء", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "169", "الاسم الرباعي واللقب": "ماجد حميد عبدالرزاق ", "الشهادة": "يكالوريوس", "العنوان الوظيفي": "مدرس رابع", "مكان العمل": "انسام الربيع", "رقم الهاتف": "7710832224", "السرية السابقة": "", "الفصيل السابق": "اتور الخفاجي", "السرية الحالية": "الشهيد باقر أبو البصيري", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "أنور باسم"}, {"ت": "170", "الاسم الرباعي واللقب": "محمد مهند فالح جابر العكيلي", "الشهادة": "بكالوريوس", "العنوان الوظيفي": "مدرس رابع", "مكان العمل": "بلاد النهرين", "رقم الهاتف": "7750137696", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "الشهيد باقر أبو البصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "سلام الدريعي"}, {"ت": "171", "الاسم الرباعي واللقب": "حيدر علي جباري حزام", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير", "رقم الهاتف": "7709039965", "السرية السابقة": "الخامسة", "الفصيل السابق": "أنور الخفاجي", "السرية الحالية": "الشهيد باقر أبو البصيري", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "سيد احمد عبد"}, {"ت": "172", "الاسم الرباعي واللقب": "حيدر مصطفى موسى جبارة العيدان", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير", "رقم الهاتف": "7721151777", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "مالك الاشتر", "الفصيل الحالي": "", "متفاعل": "غير متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "173", "الاسم الرباعي واللقب": "علي عبد العباس زويد العقرب", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير", "رقم الهاتف": "7716149875", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "174", "الاسم الرباعي واللقب": "حيدر عبد العباس زويد العقرب", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير", "رقم الهاتف": "7714359291", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا المالكي"}, {"ت": "175", "الاسم الرباعي واللقب": "مسلم عقيل عبد الحسن", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير", "رقم الهاتف": "7714442287", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "سلام الدريعي", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "لا", "اسم المستفيد": "", "المعرف": "سلام الدريعي"}, {"ت": "176", "الاسم الرباعي واللقب": "ناظم رائد حسن علي", "الشهادة": "ابتدائية", "العنوان الوظيفي": "حارس ثاني", "مكان العمل": "تربية الزبير", "رقم الهاتف": "7722532078", "السرية السابقة": "الثامنة", "الفصيل السابق": "شيخ حامد", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "دحام"}, {"ت": "177", "الاسم الرباعي واللقب": "إسكندر سعد فزاع ", "الشهادة": "اعداديه", "العنوان الوظيفي": "كاتب", "مكان العمل": "ابي تمام", "رقم الهاتف": "7727310313", "السرية السابقة": "السادسه", "الفصيل السابق": "", "السرية الحالية": "الطوارئ", "الفصيل الحالي": "", "متفاعل": "متفاعل", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "احمد الملا"}, {"ت": "178", "الاسم الرباعي واللقب": "حسين جواد كاظم المناصير ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7832371808", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "حسن جواد", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": "حسن جواد"}, {"ت": "179", "الاسم الرباعي واللقب": "احمد هويل ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "180", "الاسم الرباعي واللقب": "مرتضى إيهاب ادي رحيمة ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "181", "الاسم الرباعي واللقب": "محمد علي غالي ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "182", "الاسم الرباعي واللقب": "محمد علي بدر ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "183", "الاسم الرباعي واللقب": "محمد صلاح رهيف", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "184", "الاسم الرباعي واللقب": "محمد جاسب بري دبش", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "185", "الاسم الرباعي واللقب": "محمد جابر عبد الأمير ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "186", "الاسم الرباعي واللقب": "كرار محمد رحيمة الساري", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "187", "الاسم الرباعي واللقب": "فهد ياسر خيال نبات ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "188", "الاسم الرباعي واللقب": "علي عباس فجر طارش", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "189", "الاسم الرباعي واللقب": "علي عايد دنيف ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "190", "الاسم الرباعي واللقب": "عمار ياسر غنش ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "191", "الاسم الرباعي واللقب": "عدي يحي حمود ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "192", "الاسم الرباعي واللقب": "عباس ياسين محيسن ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "193", "الاسم الرباعي واللقب": "سجى فارس ناصر حسون ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "194", "الاسم الرباعي واللقب": "أنور  جاسم محمد عبد ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "195", "الاسم الرباعي واللقب": "المهدي صلاح رهيف ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "196", "الاسم الرباعي واللقب": "علي دخيل يوسف", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "197", "الاسم الرباعي واللقب": "نور الحسن ثائر ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "198", "الاسم الرباعي واللقب": "نزار عبدالجبار ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "199", "الاسم الرباعي واللقب": "منتظر عبدالرزاق فرج", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "200", "الاسم الرباعي واللقب": "مصعب حبيب جواد سلمان", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "201", "الاسم الرباعي واللقب": "مصطفى حميد عبدالثابت", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "202", "الاسم الرباعي واللقب": "مسلم حسن فردان", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "203", "الاسم الرباعي واللقب": "مرتضى جاسم سعيد", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "204", "الاسم الرباعي واللقب": "مرتضى احمد يوسف", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "205", "الاسم الرباعي واللقب": "محمد ناظم محمد علوان", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "206", "الاسم الرباعي واللقب": "محمد ضياء طالب", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7735228765", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "207", "الاسم الرباعي واللقب": "محمد براهيم جبر", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7731830068", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "208", "الاسم الرباعي واللقب": "محمد فاضل كاطع", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7717765521", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "209", "الاسم الرباعي واللقب": "كرار محمد رحيمه الساري", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "210", "الاسم الرباعي واللقب": "كرار علي سلطان", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7726587498", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "211", "الاسم الرباعي واللقب": "كرار خيون جاسب", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7702683778", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "212", "الاسم الرباعي واللقب": "كرار حيدر كريم", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7781339464", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "213", "الاسم الرباعي واللقب": "فايز جبار عذاب", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7735575048", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "214", "الاسم الرباعي واللقب": "عمار علي منذر مهدي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7808767371", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "215", "الاسم الرباعي واللقب": "علي عبدالكريم فدعم", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7702287124", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "216", "الاسم الرباعي واللقب": "علي حامد محي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "217", "الاسم الرباعي واللقب": "علي السجاد حسن", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7707388915", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "218", "الاسم الرباعي واللقب": "علي الدر رافد صبري", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "219", "الاسم الرباعي واللقب": "عباس اسعد عبدالرضا", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "220", "الاسم الرباعي واللقب": "صباح عبدالكريم فاضل", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "221", "الاسم الرباعي واللقب": "صادق علي حسين", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "222", "الاسم الرباعي واللقب": "سالم غالب داوود", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "223", "الاسم الرباعي واللقب": "رياض يحي حمود", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7702226583", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "224", "الاسم الرباعي واللقب": "رضا مصطفى موسى", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7721120222", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "225", "الاسم الرباعي واللقب": "حسن كريم حميد", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7772604156", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "226", "الاسم الرباعي واللقب": "حيدر عذير علي ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7712066567", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "227", "الاسم الرباعي واللقب": "حمزه جعفر شلش", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7729336124", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "228", "الاسم الرباعي واللقب": "حسين كاظم فارس", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7704095780", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "229", "الاسم الرباعي واللقب": "حسين علي طالب", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7712518432", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "230", "الاسم الرباعي واللقب": "حسن كريم فجر", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7731355707", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "231", "الاسم الرباعي واللقب": "احمد علي حسين كريم", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7703141508", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "232", "الاسم الرباعي واللقب": "علي اسعد رحيم سجاري", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7733911740", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "233", "الاسم الرباعي واللقب": "علي شمخي جبار", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7810697507", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "234", "الاسم الرباعي واللقب": "منصور عبدالحميد عبادي", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7705877708", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "235", "الاسم الرباعي واللقب": "مزعل جليل مزعل", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7703270517", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "236", "الاسم الرباعي واللقب": "حسن عدنان إسماعيل", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7734624257", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "237", "الاسم الرباعي واللقب": "حسن عباس عبدالكريم", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7857781492", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "238", "الاسم الرباعي واللقب": "كاظم عبدالرحيم ", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7733609984", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "239", "الاسم الرباعي واللقب": "حسين رضيو ثمير", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7703182980", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "240", "الاسم الرباعي واللقب": "حسام إبراهيم فرحان", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7716227003", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}, {"ت": "241", "الاسم الرباعي واللقب": "زين العابدين عدنان عبدالحسين", "الشهادة": "", "العنوان الوظيفي": "", "مكان العمل": "", "رقم الهاتف": "7706882833", "السرية السابقة": "", "الفصيل السابق": "", "السرية الحالية": "", "الفصيل الحالي": "", "متفاعل": "", "عدد افراد الاسرة": "", "افراد موظفين": "", "الدائرة": "", "مستفيد في الحركة": "", "اسم المستفيد": "", "المعرف": ""}];
+tabs[2] = [{"ت": "1", "الاسم الرباعي واللقب": "حيدر علي مزهر فجر خالد", "اسم المدرسة الجديدة": "البستان المثمر", "التحصيل الدراسي": "اعدادبة "}, {"ت": "2", "الاسم الرباعي واللقب": "راشد علي عيسى قصاب الخفاجي", "اسم المدرسة الجديدة": "ثانوية الزبير للمتفوقين ", "التحصيل الدراسي": "متوسطة"}, {"ت": "3", "الاسم الرباعي واللقب": "علي خيون جولان تقي العويد", "اسم المدرسة الجديدة": "بني هاشم الابتدائية", "التحصيل الدراسي": "اعدادية"}, {"ت": "4", "الاسم الرباعي واللقب": "عمر غسان ماجد إبراهيم النجدي", "اسم المدرسة الجديدة": "عدي بني حاتم ", "التحصيل الدراسي": "اعدادية"}, {"ت": "5", "الاسم الرباعي واللقب": "حسن ذجر سالم لواعة البخاتري", "اسم المدرسة الجديدة": "الرميلة الشمالية ", "التحصيل الدراسي": "يقرا ويكتب"}, {"ت": "6", "الاسم الرباعي واللقب": "ميثم يعقوب يوسف حود ", "اسم المدرسة الجديدة": "الامام محمد الجواد", "التحصيل الدراسي": "دبلوم "}, {"ت": "7", "الاسم الرباعي واللقب": "عثمان نعيم  حسين كريم المالكي ", "اسم المدرسة الجديدة": "مصطفى جمال الديم ", "التحصيل الدراسي": "متوسطة "}, {"ت": "8", "الاسم الرباعي واللقب": "علي عيسى قصاب علي الخفاجي ", "اسم المدرسة الجديدة": "مصعب  ابن الزبير ", "التحصيل الدراسي": "دبلوم  فني "}, {"ت": "9", "الاسم الرباعي واللقب": "حسين عبد الأمير عبد النبي محمد", "اسم المدرسة الجديدة": "الامام الكاظم ", "التحصيل الدراسي": "ابتدائية "}, {"ت": "10", "الاسم الرباعي واللقب": "محسن قصي عبد الرزاق المنصوري", "اسم المدرسة الجديدة": "الأمير الابتدائية ", "التحصيل الدراسي": ""}, {"ت": "11", "الاسم الرباعي واللقب": "عبد الكريم احمد فالح حسن المايدي ", "اسم المدرسة الجديدة": "تربية الزبير ", "التحصيل الدراسي": "اعدادية "}, {"ت": "12", "الاسم الرباعي واللقب": "تحسين علوان عناية نعيمة الغفلة", "اسم المدرسة الجديدة": "كفر قاسم ", "التحصيل الدراسي": ""}, {"ت": "13", "الاسم الرباعي واللقب": "محمد علي بدر عزيز مرهج ", "اسم المدرسة الجديدة": "مدرسة الطبري ", "التحصيل الدراسي": "ابتدائية "}, {"ت": "14", "الاسم الرباعي واللقب": "سلام علي حسن ختجر ", "اسم المدرسة الجديدة": "ابن رشد ", "التحصيل الدراسي": "ابتدائية "}, {"ت": "15", "الاسم الرباعي واللقب": "فرحان علي عبد مريهي الشغامبي", "اسم المدرسة الجديدة": "", "التحصيل الدراسي": "متوسطة"}, {"ت": "16", "الاسم الرباعي واللقب": "حيدر عبد المنعم حيدر جواد السبيعي", "اسم المدرسة الجديدة": "متوسطة البحتري", "التحصيل الدراسي": "متوسطة "}, {"ت": "17", "الاسم الرباعي واللقب": "منى عباس بري علي الدريعي", "اسم المدرسة الجديدة": "متوسطه ابي ذر الغفاري", "التحصيل الدراسي": ""}, {"ت": "18", "الاسم الرباعي واللقب": "محمد مهند فالح جابر العكيلي", "اسم المدرسة الجديدة": "وادي الكمأ", "التحصيل الدراسي": "بكالوريوس"}, {"ت": "19", "الاسم الرباعي واللقب": "حلا عبدالنبي صالح عبود النصار", "اسم المدرسة الجديدة": "رمضان مبارك", "التحصيل الدراسي": "اعدادية مهني"}, {"ت": "20", "الاسم الرباعي واللقب": "ماجد حميد عبدالرزاق خضير الحمود", "اسم المدرسة الجديدة": "متوسطة الحسن البصري", "التحصيل الدراسي": ""}, {"ت": "21", "الاسم الرباعي واللقب": "محمد حميد عبدالرزاق خضير الحمود", "اسم المدرسة الجديدة": "مدرسة الضياغم الابتدائية المختلطة", "التحصيل الدراسي": "دبلوم"}, {"ت": "22", "الاسم الرباعي واللقب": "رعد جاسب بري دبش الزبيدي", "اسم المدرسة الجديدة": "مدرسة مدين الابتدائية", "التحصيل الدراسي": ""}, {"ت": "22", "الاسم الرباعي واللقب": "حسين هادي ياسر حسين الخفاجي", "اسم المدرسة الجديدة": "انارة الدجى الابتدائية", "التحصيل الدراسي": "ابتدائيه"}, {"ت": "23", "الاسم الرباعي واللقب": "محمد ابراهيم جبر نعمه المالكي ", "اسم المدرسة الجديدة": "ذوالفقار الابتدائيه", "التحصيل الدراسي": ""}, {"ت": "24", "الاسم الرباعي واللقب": "كرار حيدر علوان عبد حرب السوفي", "اسم المدرسة الجديدة": "مدرسه الحيدريه الابتدائيه", "التحصيل الدراسي": ""}, {"ت": "25", "الاسم الرباعي واللقب": "مرتضى ايهاب وادي رحيمه البشير", "اسم المدرسة الجديدة": "كفر قاسم الابتدائيه", "التحصيل الدراسي": ""}, {"ت": "26", "الاسم الرباعي واللقب": "علي ظاهر حبيب المنصوري", "اسم المدرسة الجديدة": "اعداديه السديم للبنات", "التحصيل الدراسي": "ابتدائيه"}, {"ت": "27", "الاسم الرباعي واللقب": "حيدر نصيف جاسم لفته الدلفي", "اسم المدرسة الجديدة": "خوله بنت الحسن", "التحصيل الدراسي": "ابتدائيه"}, {"ت": "28", "الاسم الرباعي واللقب": "تقي الدين سعد عزيز ثجيل", "اسم المدرسة الجديدة": "مدرسه اسماء بنت ابي بكر", "التحصيل الدراسي": ""}, {"ت": "28", "الاسم الرباعي واللقب": "نبيل توفيق كشيش محمد المالكي", "اسم المدرسة الجديدة": "مدرسه الصراحه الابتدائيه", "التحصيل الدراسي": ""}, {"ت": "29", "الاسم الرباعي واللقب": "طيبة عبدالزهرة جبار هزاع", "اسم المدرسة الجديدة": "اعادايه ليلى الاخيليه للبنات", "التحصيل الدراسي": "بكالوريوس"}, {"ت": "30", "الاسم الرباعي واللقب": "بنين عبدالرزاق يوسف يعقوب الهرموش", "اسم المدرسة الجديدة": "ثانويه كواكب للبنات", "التحصيل الدراسي": ""}];
+tabs[3] = [{"ت": "1", "الشخص المراد استبداله": "رحيم امين رحيم الغلامي ", "الشخص الجديد": "كرار زهير محمد نعمة الركابي", "اسم الام": "اجلال زكي عبد الحسين", "الجنس": "ذكر", "التولد": "2006", "الشهادة": "اعدادية", "الاختصاص": "اعدادي", "الاختصاص الدقيق": "", "القضاء": "البصرة", "الناحية": "", "المنطقة": "القبلة", "رقم البطاقة الوطنية": "200681969934", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7706773106"}, {"ت": "2", "الشخص المراد استبداله": "مجتبى رياض كاظم ", "الشخص الجديد": "حسين محمد نعمان  عساف", "اسم الام": "ازهار شاكر", "الجنس": "ذكر", "التولد": "2005", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "المربد", "المنطقة": "المربد", "رقم البطاقة الوطنية": "200580933389", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7833597804"}, {"ت": "3", "الشخص المراد استبداله": "محمد جليل صفر نورور اللامي", "الشخص الجديد": "علي عماد خاف مكصوص المشخص", "اسم الام": "سلوى محمد خليفة", "الجنس": "ذكر", "التولد": "1999", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي الهادي", "رقم البطاقة الوطنية": "199903833767", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7740736049"}, {"ت": "4", "الشخص المراد استبداله": "محمد ناجي صالح راضي ", "الشخص الجديد": "حسن غالي رخيص حسون الفهد", "اسم الام": "ابتسام قاسم طلاب", "الجنس": "ذكر", "التولد": "1999", "الشهادة": "بكلوريوس ", "الاختصاص": "محاسبة", "الاختصاص الدقيق": "محاسبة", "القضاء": "الزبير", "الناحية": "", "المنطقة": "العرب", "رقم البطاقة الوطنية": "199906748497", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7703401001"}, {"ت": "5", "الشخص المراد استبداله": "علي عبد الحسين حطاب زبون ", "الشخص الجديد": "حسن حامد سباهي حسين ", "اسم الام": "سعدية خلف حليب", "الجنس": "ذكر", "التولد": "1998", "الشهادة": "ابتدائية", "الاختصاص": "ابتدائية", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "المربد الجديد", "رقم البطاقة الوطنية": "199851972334", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7765070650"}, {"ت": "6", "الشخص المراد استبداله": "مهدي عادل صبيح مشجل ", "الشخص الجديد": "احمد مهدي خضير مهدي", "اسم الام": "سهام عباس بري", "الجنس": "ذكر", "التولد": "1991", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محلة الكوت", "رقم البطاقة الوطنية": "199123789990", "الحالة الزوجية": "متزوج", "اسم الزوجة": "سهير ماجد خلف", "رقم الهاتف": "7726666364"}, {"ت": "7", "الشخص المراد استبداله": "حسين عبد علي عبودي ", "الشخص الجديد": "رضا ساجت ناهي داود السعيدي", "اسم الام": "قاسمية عليوي فليح", "الجنس": "ذكر", "التولد": "1999", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي الهادي", "رقم البطاقة الوطنية": "19998959006", "الحالة الزوجية": "متزوج", "اسم الزوجة": "زمن حبيب كاظم", "رقم الهاتف": "7721164646"}, {"ت": "8", "الشخص المراد استبداله": "نور الحسن حيدر علوان ", "الشخص الجديد": "اسعد يحيى حمود علي العلي", "اسم الام": "فوزية عبود كاظم", "الجنس": "ذكر", "التولد": "1979", "الشهادة": "يقرا ويكتب", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الشمالية", "رقم البطاقة الوطنية": "", "الحالة الزوجية": "متزوج", "اسم الزوجة": "نادية سامي محمد", "رقم الهاتف": "7712020419"}, {"ت": "9", "الشخص المراد استبداله": "علي مطلك كاطع ثجيل المناصير", "الشخص الجديد": "ايه حسن عبدالزهره حسن", "اسم الام": "حمديه كاظم مناتي", "الجنس": "انثى", "التولد": "2001", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الدريهميه الأولى", "رقم البطاقة الوطنية": "20013554955", "الحالة الزوجية": "متزوجه", "اسم الزوجة": "علي عبدالحسين كحيط", "رقم الهاتف": "7730479555"}, {"ت": "10", "الشخص المراد استبداله": "عباس ياسين محيسن ", "الشخص الجديد": "تبارك عبدالقادر شهيب احمد الكنعان", "اسم الام": "ليلى عباس بري", "الجنس": "انثى", "التولد": "1999", "الشهادة": "بكلوريوس ", "الاختصاص": "اداره واقتصاد", "الاختصاص الدقيق": "إدارة اعمال", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محلة الكوت", "رقم البطاقة الوطنية": "199958432864", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7782756608"}, {"ت": "11", "الشخص المراد استبداله": "سعد حسون حلو السوداني", "الشخص الجديد": "سحر حسن علي رومي الرومي", "اسم الام": "ساهرة خلف ناصر", "الجنس": "انثى", "التولد": "1992", "الشهادة": "دبلوم", "الاختصاص": "اداره مكتب", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "", "رقم البطاقة الوطنية": "199206941149", "الحالة الزوجية": "متزوجه", "اسم الزوجة": "منتصر حسين عباس", "رقم الهاتف": "7710939369"}, {"ت": "12", "الشخص المراد استبداله": "محمد  عبد الحسين محيسن عبد علي", "الشخص الجديد": "علي محمد احمد دحام اللامي", "اسم الام": "سميرة ياسين عيسى", "الجنس": "ذكر", "التولد": "2000", "الشهادة": "بكلوريوس ", "الاختصاص": "علم الأرض", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي الخطوه", "رقم البطاقة الوطنية": "200016291961", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7714939014"}, {"ت": "13", "الشخص المراد استبداله": "منتظر نوري كامل حسن", "الشخص الجديد": "حسين علي كحيط حبيب", "اسم الام": "مناهل عبود محمد", "الجنس": "ذكر", "التولد": "1997", "الشهادة": "بكلوريوس ", "الاختصاص": "اداب اكليزي", "الاختصاص الدقيق": "الترجمه", "القضاء": "الزبير", "الناحية": "", "المنطقة": "المقصب", "رقم البطاقة الوطنية": "199785342046", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7739864329"}, {"ت": "14", "الشخص المراد استبداله": "مهدي عبيد محمد علي", "الشخص الجديد": "عباس فاضل عباس ", "اسم الام": "حلا عبد النبي صالح", "الجنس": "ذكر", "التولد": "2000", "الشهادة": "اعدادية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي المعلمين", "رقم البطاقة الوطنية": "200000050702", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7713565409"}, {"ت": "15", "الشخص المراد استبداله": "سعد عبدالعباس زويد هويشم", "الشخص الجديد": "محمد ماجد عباس بري", "اسم الام": "زكيه جبارجاسم", "الجنس": "ذكر", "التولد": "2001", "الشهادة": "بكلوريوس ", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "دورالضباط", "رقم البطاقة الوطنية": "200169747336", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7729666037"}, {"ت": "16", "الشخص المراد استبداله": "سليمان ضايف حسن ضايف", "الشخص الجديد": "مصطفى علي رزيج فالح ", "اسم الام": "كريمه عباس ", "الجنس": "ذكر", "التولد": "1997", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "دورالضباط", "رقم البطاقة الوطنية": "199763960433", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7712140830"}, {"ت": "17", "الشخص المراد استبداله": "زيد اسامه ياسين", "الشخص الجديد": "عباس محمد عبود دهش الحمودي", "اسم الام": "هيفاء حسن لطيف", "الجنس": "ذكر", "التولد": "1998", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "المربد الجديد", "رقم البطاقة الوطنية": "199893049528", "الحالة الزوجية": "متزوج", "اسم الزوجة": "تهاني حمزه غفله", "رقم الهاتف": "7747337222"}, {"ت": "18", "الشخص المراد استبداله": "كرار جحيل محمد", "الشخص الجديد": "ساره غانم جاسب مطشر", "اسم الام": "هديه نعمه حسين", "الجنس": "انثى", "التولد": "1993", "الشهادة": "بكلوريوس ", "الاختصاص": "هندسه", "الاختصاص الدقيق": "حاسوب", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الدريهميه الأولى", "رقم البطاقة الوطنية": "199327490371", "الحالة الزوجية": "متزوجه", "اسم الزوجة": "عباس عبدالحسين ", "رقم الهاتف": "7703058237"}, {"ت": "19", "الشخص المراد استبداله": "أنور جاسم محمد عبد", "الشخص الجديد": "منتهى عماد محمد جاسم التميمي", "اسم الام": "اخلاص هاشم مجيد", "الجنس": "انثى", "التولد": "2006", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "بصره", "الناحية": "", "المنطقة": "مطيحه", "رقم البطاقة الوطنية": "200620968494", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7711482510"}, {"ت": "20", "الشخص المراد استبداله": "", "الشخص الجديد": "محمدالدين عبدالكريم كحيط ", "اسم الام": "زهره فرهود عبود", "الجنس": "ذكر", "التولد": "1999", "الشهادة": "دبلوم", "الاختصاص": "انظمه حاسوب", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله كوت", "رقم البطاقة الوطنية": "199931848632", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7828485464"}, {"ت": "21", "الشخص المراد استبداله": "", "الشخص الجديد": "مصطفى عبدالحسين عبدالكريم كايد", "اسم الام": "نضال حسن كايد", "الجنس": "ذكر", "التولد": "1989", "الشهادة": "بكلوريوس ", "الاختصاص": "اداب  ", "الاختصاص الدقيق": "عربي", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الجمهوريه الأولى", "رقم البطاقة الوطنية": "198935408734", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7721634018"}, {"ت": "22", "الشخص المراد استبداله": "", "الشخص الجديد": "نهاد فالح عبد الحسن مهي ", "اسم الام": "فلحه خالد ساجت", "الجنس": "انثى", "التولد": "1991", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "بصره", "الناحية": "", "المنطقة": "الزيرج", "رقم البطاقة الوطنية": "199778837417", "الحالة الزوجية": "متزوجة", "اسم الزوجة": "عباس مسلم", "رقم الهاتف": "7750925257"}, {"ت": "23", "الشخص المراد استبداله": "", "الشخص الجديد": "علي سعد نصار حسين", "اسم الام": "تهاني جاسم محمد", "الجنس": "ذكر", "التولد": "2003", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "تسعه نيسان", "رقم البطاقة الوطنية": "2003", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7732603865"}, {"ت": "24", "الشخص المراد استبداله": "", "الشخص الجديد": "ناجي حامد بنوان راضي", "اسم الام": "ربيحه سوادي مزيعل", "الجنس": "ذكر", "التولد": "2001", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي الغدير", "رقم البطاقة الوطنية": "200166989681", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7764598311"}, {"ت": "25", "الشخص المراد استبداله": "", "الشخص الجديد": "عباس وميض صبحي حواس", "اسم الام": "سحر مهدي خضير", "الجنس": "ذكر", "التولد": "2009", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله الكوت", "رقم البطاقة الوطنية": "200986114782", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7732112549"}, {"ت": "26", "الشخص المراد استبداله": "", "الشخص الجديد": "نرجس شهاب احمد عبود", "اسم الام": "سمره ذياب علي", "الجنس": "انثى", "التولد": "1984", "الشهادة": "بكلوريوس ", "الاختصاص": "علوم زراعه", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "دورالضباط", "رقم البطاقة الوطنية": "198408698178", "الحالة الزوجية": "متزوجه", "اسم الزوجة": "علاء ماجد براهيم", "رقم الهاتف": "7729233930"}, {"ت": "27", "الشخص المراد استبداله": "", "الشخص الجديد": "محمد شفيق صادق عباس محيبس المشرف", "اسم الام": "رسمية رخيص حسون", "الجنس": "ذكر", "التولد": "2000", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "العرب", "رقم البطاقة الوطنية": "200064385949", "الحالة الزوجية": "متزوج", "اسم الزوجة": "زهراء عادل سعيد", "رقم الهاتف": "7714944440"}, {"ت": "28", "الشخص المراد استبداله": "", "الشخص الجديد": "مصطفى مقداد محمد يوسف القريني ", "اسم الام": "انتصار علي عبدالحسن", "الجنس": "ذكر", "التولد": "1997", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "", "رقم البطاقة الوطنية": "199774821392", "الحالة الزوجية": "متزوج", "اسم الزوجة": "شهد نجم لفته", "رقم الهاتف": "7710987179"}, {"ت": "29", "الشخص المراد استبداله": "", "الشخص الجديد": "ذكرى ياسين رزيج", "اسم الام": "فطوم ناصر موسى", "الجنس": "انثى", "التولد": "1981", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "دورالضباط", "رقم البطاقة الوطنية": "198185598788", "الحالة الزوجية": "متزوجه", "اسم الزوجة": "حيدر عباس", "رقم الهاتف": "7730337137"}, {"ت": "30", "الشخص المراد استبداله": "", "الشخص الجديد": "سجاد حسن عبدالزهره حسن", "اسم الام": "حمديه كاظم مناتي", "الجنس": "ذكر", "التولد": "2006", "الشهادة": "ابتدائيه", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "بصره", "الناحية": "", "المنطقة": "5 ميل", "رقم البطاقة الوطنية": "200661579678", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7729300379"}, {"ت": "31", "الشخص المراد استبداله": "", "الشخص الجديد": "ضياء محسن ناصر الطائي", "اسم الام": "نجات زرزور مسعد", "الجنس": "ذكر", "التولد": "1998", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "بصره", "الناحية": "", "المنطقة": "", "رقم البطاقة الوطنية": "199835478757", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7819625650"}, {"ت": "32", "الشخص المراد استبداله": "", "الشخص الجديد": "عذراء كريم حنون مخيط", "اسم الام": "قديمه حسن حميدي", "الجنس": "انثى", "التولد": "1991", "الشهادة": "اعدادية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "بصره", "الناحية": "", "المنطقة": "", "رقم البطاقة الوطنية": "199181182951", "الحالة الزوجية": "متزوجه", "اسم الزوجة": "حسن محسن ناصر", "رقم الهاتف": "7810122900"}, {"ت": "33", "الشخص المراد استبداله": "", "الشخص الجديد": "كاظم احمد كاظم علي", "اسم الام": "التفات علي جباره", "الجنس": "ذكر", "التولد": "2006", "الشهادة": "اعدادية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله عرب", "رقم البطاقة الوطنية": "200649643317", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7734814999"}, {"ت": "34", "الشخص المراد استبداله": "", "الشخص الجديد": "محسن رهيف عايز سميج العيسى", "اسم الام": "ورده عبود شلاكه", "الجنس": "ذكر", "التولد": "1986", "الشهادة": "يقرا ويكتب", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "", "رقم البطاقة الوطنية": "1986", "الحالة الزوجية": "متزوج", "اسم الزوجة": "هاله محسن شاهين", "رقم الهاتف": "7858929688"}, {"ت": "35", "الشخص المراد استبداله": "", "الشخص الجديد": "عقيل علي سماعيل علي الوحيلي", "اسم الام": "فضيله خلف علي", "الجنس": "ذكر", "التولد": "1994", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله عرب", "رقم البطاقة الوطنية": "1994", "الحالة الزوجية": "متزوج", "اسم الزوجة": "اثمار علي خضير", "رقم الهاتف": "7726464485"}, {"ت": "36", "الشخص المراد استبداله": "", "الشخص الجديد": "علي محمد شاكر مسلم", "اسم الام": "حكيمه كريم غيلان", "الجنس": "ذكر", "التولد": "2008", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي الحكيم", "رقم البطاقة الوطنية": "200825815047", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7749300355"}, {"ت": "37", "الشخص المراد استبداله": "", "الشخص الجديد": "كرار عادل عبدالزهره حسن الجعاري", "اسم الام": "مريم جبار حسن", "الجنس": "ذكر", "التولد": "2005", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله عرب", "رقم البطاقة الوطنية": "200575944565", "الحالة الزوجية": "متزوج", "اسم الزوجة": "", "رقم الهاتف": "7738596835"}, {"ت": "38", "الشخص المراد استبداله": "", "الشخص الجديد": "علي حسين قاسم كريم التميمي", "اسم الام": "", "الجنس": "ذكر", "التولد": "2000", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله عرب", "رقم البطاقة الوطنية": "20002713889", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "77552080260"}, {"ت": "39", "الشخص المراد استبداله": "", "الشخص الجديد": "علي سوادي شخير جويد الركابي", "اسم الام": "مطشره جخيم حسوني", "الجنس": "ذكر", "التولد": "1983", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله عرب", "رقم البطاقة الوطنية": "198396931203", "الحالة الزوجية": "متزوج", "اسم الزوجة": "غصون هويله شخير", "رقم الهاتف": "7709040743"}, {"ت": "40", "الشخص المراد استبداله": "", "الشخص الجديد": "حسين علي بنوان جواري الربيعي", "اسم الام": "اخلاص عليوي كايم", "الجنس": "ذكر", "التولد": "2009", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله عرب", "رقم البطاقة الوطنية": "200994138266", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7712634015"}, {"ت": "41", "الشخص المراد استبداله": "", "الشخص الجديد": "علي عمار عبدالكاظم حزام", "اسم الام": "افراح سالم عبدعلي", "الجنس": "ذكر", "التولد": "2006", "الشهادة": "اعدادية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محله العرب 2", "رقم البطاقة الوطنية": "200687157169", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7729236999"}, {"ت": "42", "الشخص المراد استبداله": "", "الشخص الجديد": "نجاة صبار عليوي جباره ", "اسم الام": "لميعه حسن ", "الجنس": "انثى", "التولد": "1992", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "المربد", "رقم البطاقة الوطنية": "199285719485", "الحالة الزوجية": "متزوجة", "اسم الزوجة": "علي طالب", "رقم الهاتف": "7710950961"}, {"ت": "43", "الشخص المراد استبداله": "", "الشخص الجديد": "زينب سامي عبد الرحيم سلطان السلمي ", "اسم الام": "جماله إسماعيل عبيد ", "الجنس": "انثى", "التولد": "2003", "الشهادة": "بكالوريوس", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الدريهمية", "رقم البطاقة الوطنية": "200324635234", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7742137442"}, {"ت": "44", "الشخص المراد استبداله": "", "الشخص الجديد": "سماء فالح عبيد خضير الفضلي", "اسم الام": "فاطمة جابر عبيد", "الجنس": "انثى", "التولد": "1975", "الشهادة": "دبلوم", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محلة الشمال", "رقم البطاقة الوطنية": "197545806259", "الحالة الزوجية": "متزوجة", "اسم الزوجة": "عبلس فاضل عبيد", "رقم الهاتف": "7705607089"}, {"ت": "45", "الشخص المراد استبداله": "", "الشخص الجديد": "غادة محمد كاظم كاطع حسن الحميداوي ", "اسم الام": "مديحة قاسم كاطع ", "الجنس": "انثى", "التولد": "2003", "الشهادة": "بكالوريوس", "الاختصاص": "إنكليزي", "الاختصاص الدقيق": "ترجمة", "القضاء": "الزبير", "الناحية": "", "المنطقة": "دور الضباط", "رقم البطاقة الوطنية": "200369526013", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7705680646"}, {"ت": "46", "الشخص المراد استبداله": "", "الشخص الجديد": "عباس ماجد عباس ", "اسم الام": "زكية جبار جاسم", "الجنس": "ذكر", "التولد": "1994", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "دور الضباط", "رقم البطاقة الوطنية": "1997", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7702222136"}, {"ت": "47", "الشخص المراد استبداله": "", "الشخص الجديد": "حسين علي رخيص حسون الفهد", "اسم الام": "أحلام عمار حاجم", "الجنس": "ذكر", "التولد": "1994", "الشهادة": "ابتدائية ", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي الاندلس", "رقم البطاقة الوطنية": "199409205968", "الحالة الزوجية": "متزوج", "اسم الزوجة": "طيبة علاء هاشم", "رقم الهاتف": "7712604998"}, {"ت": "48", "الشخص المراد استبداله": "", "الشخص الجديد": "زياد سعد حميدي زجاري الجحيشاوي", "اسم الام": "مديحةعاشور وادي", "الجنس": "ذكر", "التولد": "1988", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي العرب", "رقم البطاقة الوطنية": "198898457525", "الحالة الزوجية": "متزوج ", "اسم الزوجة": "فاطمة عبدالخالق", "رقم الهاتف": "7706748778"}, {"ت": "49", "الشخص المراد استبداله": "", "الشخص الجديد": "احمد رحيم غالب شنين البطي", "اسم الام": "حضيه شعبان شنين", "الجنس": "ذكر", "التولد": "1992", "الشهادة": "بكالوريوس", "الاختصاص": "قانون", "الاختصاص الدقيق": "محامي", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الشعيبة", "رقم البطاقة الوطنية": "199229654352", "الحالة الزوجية": "متزوج", "اسم الزوجة": "", "رقم الهاتف": "7802202607"}, {"ت": "50", "الشخص المراد استبداله": "", "الشخص الجديد": "منذر جابر عبدالامير عبيد الكنعان", "اسم الام": "جبره لفته خليل", "الجنس": "ذكر", "التولد": "1993", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "المربد", "رقم البطاقة الوطنية": "199367175348", "الحالة الزوجية": "متزوج", "اسم الزوجة": "زينب عبد", "رقم الهاتف": "7719178222"}, {"ت": "51", "الشخص المراد استبداله": "", "الشخص الجديد": "جاسم محمد رخيص حسون الفهد ", "اسم الام": "نهال لازم طلاب ", "الجنس": "ذكر", "التولد": "1999", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محلة العرب", "رقم البطاقة الوطنية": "199903044781", "الحالة الزوجية": "مزوج", "اسم الزوجة": "زينب علي", "رقم الهاتف": "7739400902"}, {"ت": "52", "الشخص المراد استبداله": "", "الشخص الجديد": "عذراء عدنان خلف سبتي الصكر", "اسم الام": "انتصار حميد سرحان ", "الجنس": "انثى", "التولد": "1989", "الشهادة": "بكالوريوس", "الاختصاص": "قانون", "الاختصاص الدقيق": "محامية", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الجاهزه", "رقم البطاقة الوطنية": "198928121357", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7705598994"}, {"ت": "53", "الشخص المراد استبداله": "", "الشخص الجديد": "محمد علي رزيج الدريعي", "اسم الام": "كريمة عباس", "الجنس": "ذكر", "التولد": "2001", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "دور الضباط", "رقم البطاقة الوطنية": "200130069479", "الحالة الزوجية": "اعزب", "اسم الزوجة": "", "رقم الهاتف": "7734629310"}, {"ت": "54", "الشخص المراد استبداله": "", "الشخص الجديد": "سجى محمد جاسم محمد", "اسم الام": "فضيله عبد علي", "الجنس": "انثى", "التولد": "1995", "الشهادة": "دبلوم", "الاختصاص": "كتروني", "الاختصاص الدقيق": "", "القضاء": "ابي الخصيب", "الناحية": "", "المنطقة": "مهيجران", "رقم البطاقة الوطنية": "199577804466", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7707014676"}, {"ت": "55", "الشخص المراد استبداله": "", "الشخص الجديد": "علاء قصى عبد الجبار خليل التميمي ", "اسم الام": "بشرى عبدالله ريحان", "الجنس": "ذكر", "التولد": "1996", "الشهادة": "ابتدائية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "البصرة", "الناحية": "", "المنطقة": "حي الحسين", "رقم البطاقة الوطنية": "1996", "الحالة الزوجية": "متزوج", "اسم الزوجة": "امنه مهدي", "رقم الهاتف": "7844554807"}, {"ت": "56", "الشخص المراد استبداله": "", "الشخص الجديد": "عدي حسن محمود كمر", "اسم الام": "فوزيةكاظم محمد", "الجنس": "ذكر", "التولد": "1976", "الشهادة": "اعدادية", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "محاة العرب", "رقم البطاقة الوطنية": "1976449117985", "الحالة الزوجية": "متزوج", "اسم الزوجة": "نور خلف", "رقم الهاتف": "7703142862"}, {"ت": "57", "الشخص المراد استبداله": "", "الشخص الجديد": "فاطمة محمد عبد المحسن يازع ", "اسم الام": "ميسون رشيد عارف", "الجنس": "انثى", "التولد": "2001", "الشهادة": "دبلوم", "الاختصاص": "اداره مكاتب", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي المعلمين", "رقم البطاقة الوطنية": "200115917218", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7781228994"}, {"ت": "58", "الشخص المراد استبداله": "", "الشخص الجديد": "فاطمة فاضل عباس بري ", "اسم الام": "حلا عبد النبي", "الجنس": "انثى", "التولد": "2001", "الشهادة": "اعدادية", "الاختصاص": "كاتبة", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي المعلمين", "رقم البطاقة الوطنية": "200100762494", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7705732027"}, {"ت": "59", "الشخص المراد استبداله": "", "الشخص الجديد": "مروه علي رزيج الدريعي", "اسم الام": "كريمة عباس", "الجنس": "انثى", "التولد": "1987", "الشهادة": "متوسطة", "الاختصاص": "", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "المكصب", "رقم البطاقة الوطنية": "198741468658", "الحالة الزوجية": "متزوجة", "اسم الزوجة": "نبيل صبحي", "رقم الهاتف": "7832070637"}, {"ت": "60", "الشخص المراد استبداله": "", "الشخص الجديد": "هدى فاضل عباس عبد العالي الخفاجي", "اسم الام": "منتهى جاسم", "الجنس": "انثى", "التولد": "2001", "الشهادة": "بكالوريوس", "الاختصاص": "التربية", "الاختصاص الدقيق": "علوم الحياة", "القضاء": "الزبير", "الناحية": "", "المنطقة": "الدريهمية", "رقم البطاقة الوطنية": "200168590516", "الحالة الزوجية": "عزباء", "اسم الزوجة": "", "رقم الهاتف": "7723938129"}, {"ت": "61", "الشخص المراد استبداله": "", "الشخص الجديد": "زهراء عبد المحسن هزاع علي ", "اسم الام": "سليمة جمعة", "الجنس": "انثى", "التولد": "1992", "الشهادة": "دبلوم", "الاختصاص": "تقني", "الاختصاص الدقيق": "", "القضاء": "الزبير", "الناحية": "", "المنطقة": "حي المعلمين", "رقم البطاقة الوطنية": "199255663031", "الحالة الزوجية": "متزوجة", "اسم الزوجة": "ميثم سامي", "رقم الهاتف": "7710670277"}];
+
+filtered[1] = [...tabs[1]];
+filtered[2] = [...tabs[2]];
+filtered[3] = [...tabs[3]];
+
+function init() {
+  loadFromStorage();
+  renderAll();
+  updateBadges();
+  updateStats();
+  saveToStorage();
+  initTab4();
+}
+
+// ── حفظ وتحميل البيانات ──────────────────────────────────────────
+function saveToStorage() {
+  try {
+    localStorage.setItem('sys_tab1', JSON.stringify(tabs[1]));
+    localStorage.setItem('sys_tab2', JSON.stringify(tabs[2]));
+    localStorage.setItem('sys_tab3', JSON.stringify(tabs[3] || []));
+    const now = new Date();
+    localStorage.setItem('sys_saved_at', now.toISOString());
+    showToast('✅ تم الحفظ بنجاح');
+    const str = now.toLocaleDateString('ar-IQ') + ' ' + now.toLocaleTimeString('ar-IQ');
+    [1,2,3].forEach(n => {
+      const btn = document.getElementById('save-btn-'+n);
+      const lbl = document.getElementById('last-saved-'+n);
+      if (btn) btn.style.display = 'none';
+      if (lbl) { lbl.textContent = 'آخر حفظ: ' + str; lbl.style.display = 'inline'; }
+    });
+  } catch(e) {
+    showToast('❌ فشل الحفظ: ' + e.message, true);
+  }
+}
+
+function markUnsaved() {
+  [1,2,3].forEach(n => {
+    const btn = document.getElementById('save-btn-'+n);
+    if (btn) btn.style.display = 'inline-flex';
+  });
+}
+
+function loadFromStorage() {
+  try {
+    const t1 = localStorage.getItem('sys_tab1');
+    const t2 = localStorage.getItem('sys_tab2');
+    const t3 = localStorage.getItem('sys_tab3');
+    if (t1) { tabs[1] = JSON.parse(t1); filtered[1] = [...tabs[1]]; }
+    if (t2) { tabs[2] = JSON.parse(t2); filtered[2] = [...tabs[2]]; }
+    if (t3 && tabs[3]) { tabs[3] = JSON.parse(t3); filtered[3] = [...tabs[3]]; }
+    const savedAt = localStorage.getItem('sys_saved_at');
+    if (savedAt) {
+      const d = new Date(savedAt);
+      const str = d.toLocaleDateString('ar-IQ') + ' ' + d.toLocaleTimeString('ar-IQ');
+      [1,2,3].forEach(n => {
+        const lbl = document.getElementById('last-saved-'+n);
+        if (lbl) { lbl.textContent = 'آخر حفظ: ' + str; lbl.style.display = 'inline'; }
+      });
+    }
+  } catch(e) {
+    console.warn('خطأ في تحميل البيانات:', e);
+  }
+}
+
+function updateBadges() {
+  document.getElementById('badge1').textContent = tabs[1].length;
+  document.getElementById('badge2').textContent = tabs[2].length;
+  document.getElementById('badge3').textContent = tabs[3].length;
+}
+
+function updateStats() {
+  document.getElementById('t1-total').textContent = tabs[1].length;
+  document.getElementById('t1-mote').textContent = tabs[1].filter(r=>r['متفاعل']==='متفاعل').length;
+  document.getElementById('t1-search-count').textContent = filtered[1].length;
+  document.getElementById('t2-total').textContent = tabs[2].length;
+  document.getElementById('t2-search-count').textContent = filtered[2].length;
+  document.getElementById('t3-total').textContent = tabs[3].length;
+  document.getElementById('t3-search-count').textContent = filtered[3].length;
+}
+
+function switchTab(n) {
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active', i===n-1));
+  document.querySelectorAll('.tab-content').forEach((c,i)=>c.classList.toggle('active', i===n-1));
+}
+
+// TAB 4 - تواصل
+let filtered4 = [];
+let page4 = 1;
+
+function initTab4() {
+  filtered4 = tabs[1].map((r, i) => ({
+    idx: i + 1,
+    name: r['الاسم الرباعي واللقب'] || '',
+    phone: r['رقم الهاتف'] || ''
+  }));
+  document.getElementById('badge4').textContent = filtered4.length;
+  document.getElementById('t4-total').textContent = filtered4.length;
+  document.getElementById('t4-with-phone').textContent = filtered4.filter(r => r.phone.trim() !== '').length;
+  document.getElementById('t4-search-count').textContent = filtered4.length;
+  renderTab4();
+}
+
+function filterTable4() {
+  const q = document.getElementById('search4').value.trim().toLowerCase();
+  const source = tabs[1].map((r, i) => ({
+    idx: i + 1,
+    name: r['الاسم الرباعي واللقب'] || '',
+    phone: r['رقم الهاتف'] || ''
+  }));
+  if (!q) {
+    filtered4 = source;
+  } else {
+    filtered4 = source.filter(r =>
+      r.name.toLowerCase().includes(q) || r.phone.includes(q)
+    );
+  }
+  page4 = 1;
+  document.getElementById('t4-search-count').textContent = filtered4.length;
+  renderTab4();
+}
+
+function renderTab4() {
+  const tbody = document.getElementById('tbody4');
+  const data = filtered4;
+  const start = (page4 - 1) * PAGE_SIZE;
+  const pageData = data.slice(start, start + PAGE_SIZE);
+
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">
+      <div class="empty-state"><div class="empty-icon">🔍</div><p>لا توجد نتائج</p></div>
+    </td></tr>`;
+    document.getElementById('pageinfo4').textContent = '';
+    document.getElementById('pages4').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = pageData.map(r => {
+    const phone = r.phone.trim().replace(/\s/g, '');
+    let waBtn = '';
+    if (phone) {
+      // تنسيق رقم الهاتف العراقي للواتساب (964 + الرقم بدون صفر أول)
+      let waNum = phone;
+      if (waNum.startsWith('07') || waNum.startsWith('7')) {
+        waNum = waNum.replace(/^0/, '');
+        waNum = '964' + waNum;
+      }
+      waBtn = `<a href="https://wa.me/${waNum}" target="_blank" class="btn btn-wa">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        واتساب
+      </a>`;
+    } else {
+      waBtn = `<span class="badge badge-gray">لا يوجد رقم</span>`;
+    }
+
+    return `<tr>
+      <td><span class="badge badge-gray">${r.idx}</span></td>
+      <td style="font-weight:600">${r.name}</td>
+      <td dir="ltr" style="font-family:monospace">${r.phone || '—'}</td>
+      <td>${waBtn}</td>
+    </tr>`;
+  }).join('');
+
+  const totalPages = Math.ceil(data.length / PAGE_SIZE);
+  document.getElementById('pageinfo4').textContent =
+    `عرض ${start + 1} - ${Math.min(start + PAGE_SIZE, data.length)} من ${data.length} سجل`;
+
+  if (totalPages > 1) {
+    let phtml = `<button class="page-btn" onclick="goPage4(${page4 - 1})" ${page4 === 1 ? 'disabled' : ''}>‹ السابق</button>`;
+    for (let p = 1; p <= totalPages; p++) {
+      if (p === 1 || p === totalPages || Math.abs(p - page4) <= 2)
+        phtml += `<button class="page-btn ${p === page4 ? 'active' : ''}" onclick="goPage4(${p})">${p}</button>`;
+      else if (Math.abs(p - page4) === 3)
+        phtml += `<span style="color:#8b949e;padding:0 4px">...</span>`;
+    }
+    phtml += `<button class="page-btn" onclick="goPage4(${page4 + 1})" ${page4 === totalPages ? 'disabled' : ''}>التالي ›</button>`;
+    document.getElementById('pages4').innerHTML = phtml;
+  } else {
+    document.getElementById('pages4').innerHTML = '';
+  }
+}
+
+function goPage4(p) {
+  const total = Math.ceil(filtered4.length / PAGE_SIZE);
+  if (p < 1 || p > total) return;
+  page4 = p;
+  renderTab4();
+}
+
+function filterTable(n) {
+  const q = document.getElementById('search'+n).value.trim().toLowerCase();
+  if (!q) { filtered[n] = [...tabs[n]]; }
+  else {
+    filtered[n] = tabs[n].filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(q)));
+  }
+  pages[n] = 1;
+  renderTable(n);
+  updateStats();
+}
+
+function renderAll() {
+  renderTable(1); renderTable(2); renderTable(3);
+}
+
+function renderTable(n) {
+  const tbody = document.getElementById('tbody'+n);
+  const data = filtered[n];
+  const start = (pages[n]-1)*PAGE_SIZE;
+  const pageData = data.slice(start, start+PAGE_SIZE);
+  
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="20">
+      <div class="empty-state"><div class="empty-icon">🔍</div><p>لا توجد نتائج</p></div>
+    </td></tr>`;
+    document.getElementById('pageinfo'+n).textContent = '';
+    document.getElementById('pages'+n).innerHTML = '';
+    return;
+  }
+
+  if (n===1) tbody.innerHTML = pageData.map((r,i)=>`
+    <tr>
+      <td><span class="badge badge-gray">${r['ت']}</span></td>
+      <td style="font-weight:600">${r['الاسم الرباعي واللقب']}</td>
+      <td><span class="badge badge-blue">${r['الشهادة']}</span></td>
+      <td>${r['العنوان الوظيفي']}</td>
+      <td>${r['مكان العمل']}</td>
+      <td dir="ltr">${r['رقم الهاتف']}</td>
+      <td>${r['السرية السابقة']}</td>
+      <td>${r['الفصيل السابق']}</td>
+      <td>${r['السرية الحالية']}</td>
+      <td><span class="badge ${r['متفاعل']==='متفاعل'?'badge-green':'badge-red'}">${r['متفاعل']}</span></td>
+      <td>${r['عدد افراد الاسرة']}</td>
+      <td><span class="badge ${r['مستفيد في الحركة']==='نعم'?'badge-orange':'badge-gray'}">${r['مستفيد في الحركة']}</span></td>
+      <td style="font-size:12px;color:#8b949e">${r['المعرف']}</td>
+      <td><div class="actions">
+        <button class="action-btn action-edit" onclick="openEditModal(1,  ${start+i})">✏️</button>
+        <button class="action-btn action-del" onclick="askDelete(1, ${start+i})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+  
+  if (n===2) tbody.innerHTML = pageData.map((r,i)=>`
+    <tr>
+      <td><span class="badge badge-gray">${r['ت']}</span></td>
+      <td style="font-weight:600">${r['الاسم الرباعي واللقب']}</td>
+      <td>${r['اسم المدرسة الجديدة']}</td>
+      <td><span class="badge badge-blue">${r['التحصيل الدراسي']}</span></td>
+      <td><div class="actions">
+        <button class="action-btn action-edit" onclick="openEditModal(2, ${start+i})">✏️</button>
+        <button class="action-btn action-del" onclick="askDelete(2, ${start+i})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+
+  if (n===3) tbody.innerHTML = pageData.map((r,i)=>`
+    <tr>
+      <td><span class="badge badge-gray">${r['ت']}</span></td>
+      <td style="color:#f85149;font-weight:600">${r['الشخص المراد استبداله']}</td>
+      <td style="color:#3fb950;font-weight:600">${r['الشخص الجديد']}</td>
+      <td>${r['اسم الام']}</td>
+      <td>${r['الجنس']}</td>
+      <td>${r['التولد']}</td>
+      <td><span class="badge badge-blue">${r['الشهادة']}</span></td>
+      <td>${r['القضاء']}</td>
+      <td>${r['الناحية']}</td>
+      <td>${r['المنطقة']}</td>
+      <td style="font-size:12px" dir="ltr">${r['رقم البطاقة الوطنية']}</td>
+      <td><span class="badge ${r['الحالة الزوجية']==='متزوج'?'badge-orange':'badge-gray'}">${r['الحالة الزوجية']}</span></td>
+      <td>${r['اسم الزوجة']}</td>
+      <td dir="ltr">${r['رقم الهاتف']}</td>
+      <td><div class="actions">
+        <button class="action-btn action-edit" onclick="openEditModal(3, ${start+i})">✏️</button>
+        <button class="action-btn action-del" onclick="askDelete(3, ${start+i})">🗑️</button>
+      </div></td>
+    </tr>`).join('');
+
+  const totalPages = Math.ceil(data.length / PAGE_SIZE);
+  document.getElementById('pageinfo'+n).textContent = 
+    `عرض ${start+1} - ${Math.min(start+PAGE_SIZE, data.length)} من ${data.length} سجل`;
+  
+  if (totalPages > 1) {
+    let phtml = `<button class="page-btn" onclick="goPage(${n},${pages[n]-1})" ${pages[n]===1?'disabled':''}>‹ السابق</button>`;
+    for(let p=1;p<=totalPages;p++) {
+      if (p===1 || p===totalPages || Math.abs(p-pages[n])<=2)
+        phtml += `<button class="page-btn ${p===pages[n]?'active':''}" onclick="goPage(${n},${p})">${p}</button>`;
+      else if (Math.abs(p-pages[n])===3)
+        phtml += `<span style="color:#8b949e;padding:0 4px">...</span>`;
+    }
+    phtml += `<button class="page-btn" onclick="goPage(${n},${pages[n]+1})" ${pages[n]===totalPages?'disabled':''}>التالي ›</button>`;
+    document.getElementById('pages'+n).innerHTML = phtml;
+  } else {
+    document.getElementById('pages'+n).innerHTML = '';
+  }
+}
+
+function goPage(n, p) {
+  const total = Math.ceil(filtered[n].length/PAGE_SIZE);
+  if(p<1||p>total) return;
+  pages[n]=p;
+  renderTable(n);
+}
+
+// MODAL OPEN
+function openAddModal(n) {
+  editIdx[n] = null;
+  clearModal(n);
+  document.getElementById('m'+n+'-title').textContent = 'إضافة سجل جديد';
+  document.getElementById('modal'+n).classList.add('open');
+}
+
+function openEditModal(n, idx) {
+  editIdx[n] = idx;
+  const r = filtered[n][idx];
+  document.getElementById('m'+n+'-title').textContent = 'تعديل السجل';
+  if(n===1) {
+    document.getElementById('m1-name').value = r['الاسم الرباعي واللقب'];
+    document.getElementById('m1-cert').value = r['الشهادة'];
+    document.getElementById('m1-title2').value = r['العنوان الوظيفي'];
+    document.getElementById('m1-work').value = r['مكان العمل'];
+    document.getElementById('m1-phone').value = r['رقم الهاتف'];
+    document.getElementById('m1-oldsariya').value = r['السرية السابقة'];
+    document.getElementById('m1-oldfaseel').value = r['الفصيل السابق'];
+    document.getElementById('m1-newsariya').value = r['السرية الحالية'];
+    document.getElementById('m1-interact').value = r['متفاعل'];
+    document.getElementById('m1-family').value = r['عدد افراد الاسرة'];
+    document.getElementById('m1-emp').value = r['افراد موظفين'];
+    document.getElementById('m1-dept').value = r['الدائرة'];
+    document.getElementById('m1-benef').value = r['مستفيد في الحركة'];
+    document.getElementById('m1-benefname').value = r['اسم المستفيد'];
+    document.getElementById('m1-ref').value = r['المعرف'];
+  } else if(n===2) {
+    document.getElementById('m2-name').value = r['الاسم الرباعي واللقب'];
+    document.getElementById('m2-school').value = r['اسم المدرسة الجديدة'];
+    document.getElementById('m2-edu').value = r['التحصيل الدراسي'];
+  } else {
+    document.getElementById('m3-old').value = r['الشخص المراد استبداله'];
+    document.getElementById('m3-new').value = r['الشخص الجديد'];
+    document.getElementById('m3-mom').value = r['اسم الام'];
+    document.getElementById('m3-gender').value = r['الجنس'];
+    document.getElementById('m3-born').value = r['التولد'];
+    document.getElementById('m3-cert').value = r['الشهادة'];
+    document.getElementById('m3-spec').value = r['الاختصاص'];
+    document.getElementById('m3-specx').value = r['الاختصاص الدقيق'];
+    document.getElementById('m3-qada').value = r['القضاء'];
+    document.getElementById('m3-nahia').value = r['الناحية'];
+    document.getElementById('m3-area').value = r['المنطقة'];
+    document.getElementById('m3-nid').value = r['رقم البطاقة الوطنية'];
+    document.getElementById('m3-marital').value = r['الحالة الزوجية'];
+    document.getElementById('m3-wife').value = r['اسم الزوجة'];
+    document.getElementById('m3-phone').value = r['رقم الهاتف'];
+  }
+  document.getElementById('modal'+n).classList.add('open');
+}
+
+function clearModal(n) {
+  document.getElementById('modal'+n).querySelectorAll('input,select').forEach(el=>el.value='');
+}
+
+function closeModal(n) {
+  document.getElementById('modal'+n).classList.remove('open');
+  editIdx[n] = null;
+}
+
+function normalizeAr(s) {
+  if (!s) return '';
+  return s.trim()
+    .replace(/[أإآا]/g, 'ا')
+    .replace(/[ةه]/g, 'ه')
+    .replace(/[يى]/g, 'ي')
+    .replace(/\s+/g, ' ');
+}
+
+function threeWords(s) {
+  if (!s) return '';
+  return normalizeAr(s).split(' ').slice(0, 3).join(' ');
+}
+
+function checkDuplicate(n, nameFields, phoneField, nameVal, phoneVal, currentIdx) {
+  const dupes = [];
+  const normNew   = normalizeAr(nameVal);
+  const threeNew  = threeWords(nameVal);
+  const normPhone = phoneVal ? phoneVal.replace(/\s/g, '') : '';
+
+  tabs[n].forEach((r, i) => {
+    if (currentIdx !== null && i === currentIdx) return;
+
+    let exactMatch  = false;
+    let threeMatch  = false;
+    let phoneMatch  = false;
+    let matchedField = '';
+
+    // فحص الاسم في كل حقل اسم
+    nameFields.forEach(f => {
+      if (!r[f]) return;
+      const normR  = normalizeAr(r[f]);
+      const threeR = threeWords(r[f]);
+      if (normR === normNew)      { exactMatch = true; matchedField = f; }
+      else if (threeR === threeNew && threeNew.split(' ').length >= 3) {
+        threeMatch = true; matchedField = f;
+      }
+    });
+
+    // فحص رقم الهاتف
+    if (normPhone && phoneField && r[phoneField]) {
+      const rPhone = r[phoneField].replace(/\s/g, '');
+      if (rPhone === normPhone) phoneMatch = true;
+    }
+
+    if (exactMatch || threeMatch || phoneMatch) {
+      dupes.push({ row: r, exactMatch, threeMatch, phoneMatch, matchedField });
+    }
+  });
+  return dupes;
+}
+
+function showDuplicateWarning(dupes, onConfirm) {
+  const list = dupes.map(d => {
+    const reasons = [];
+    if (d.exactMatch)  reasons.push('<span style="color:#f85149;font-weight:700">⚠️ تطابق تام في الاسم</span>');
+    if (d.threeMatch)  reasons.push('<span style="color:#f0883e;font-weight:700">🔶 تشابه في الاسم الثلاثي</span>');
+    if (d.phoneMatch)  reasons.push('<span style="color:#58a6ff;font-weight:700">📞 تطابق في رقم الهاتف</span>');
+
+    // استخرج الاسم وبيانات للعرض
+    const nameKey = d.matchedField ||
+      Object.keys(d.row).find(k => k.includes('اسم') || k.includes('الشخص')) || '';
+    const dispName = nameKey ? d.row[nameKey] : '';
+    const phoneKey = Object.keys(d.row).find(k => k.includes('هاتف')) || '';
+    const dispPhone = phoneKey ? d.row[phoneKey] : '';
+    const tKey = 'ت';
+    const dispT = d.row[tKey] ? 'سجل رقم ' + d.row[tKey] : '';
+
+    return `<li style="margin:8px 0;padding:10px 12px;background:rgba(248,81,73,0.07);border-radius:8px;border-right:4px solid #f85149;text-align:right">
+      <div style="font-size:14px;font-weight:700;color:#e6edf3;margin-bottom:4px">${dispName}</div>
+      <div style="font-size:12px;color:#8b949e;margin-bottom:5px">${dispT}${dispPhone ? ' &nbsp;|&nbsp; 📞 ' + dispPhone : ''}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${reasons.join('')}</div>
+    </li>`;
+  }).join('');
+
+  document.getElementById('dupeDlg').classList.add('open');
+  document.getElementById('dupeList').innerHTML = `<ul style="list-style:none;padding:0;margin:0">${list}</ul>`;
+  document.getElementById('dupeConfirmBtn').onclick = () => {
+    document.getElementById('dupeDlg').classList.remove('open');
+    onConfirm();
+  };
+}
+
+function saveRecord(n) {
+  let rec;
+  let nameVal = '', phoneVal = '', nameFields = [], phoneField = '', currentTabIdx = null;
+
+  if(n===1) {
+    const name = document.getElementById('m1-name').value.trim();
+    if(!name) { showToast('يرجى إدخال الاسم', true); return; }
+    phoneVal = document.getElementById('m1-phone').value.trim();
+    nameVal = name;
+    nameFields = ['الاسم الرباعي واللقب'];
+    phoneField = 'رقم الهاتف';
+    rec = {
+      'ت': editIdx[1]!==null ? filtered[1][editIdx[1]]['ت'] : String(tabs[1].length+1),
+      'الاسم الرباعي واللقب': name,
+      'الشهادة': document.getElementById('m1-cert').value,
+      'العنوان الوظيفي': document.getElementById('m1-title2').value,
+      'مكان العمل': document.getElementById('m1-work').value,
+      'رقم الهاتف': phoneVal,
+      'السرية السابقة': document.getElementById('m1-oldsariya').value,
+      'الفصيل السابق': document.getElementById('m1-oldfaseel').value,
+      'السرية الحالية': document.getElementById('m1-newsariya').value,
+      'الفصيل الحالي': '',
+      'متفاعل': document.getElementById('m1-interact').value,
+      'عدد افراد الاسرة': document.getElementById('m1-family').value,
+      'افراد موظفين': document.getElementById('m1-emp').value,
+      'الدائرة': document.getElementById('m1-dept').value,
+      'مستفيد في الحركة': document.getElementById('m1-benef').value,
+      'اسم المستفيد': document.getElementById('m1-benefname').value,
+      'المعرف': document.getElementById('m1-ref').value,
+    };
+    if(editIdx[1]!==null) currentTabIdx = tabs[1].indexOf(filtered[1][editIdx[1]]);
+  } else if(n===2) {
+    const name = document.getElementById('m2-name').value.trim();
+    if(!name) { showToast('يرجى إدخال الاسم', true); return; }
+    nameVal = name;
+    nameFields = ['الاسم الرباعي واللقب'];
+    phoneField = '';
+    rec = {
+      'ت': editIdx[2]!==null ? filtered[2][editIdx[2]]['ت'] : String(tabs[2].length+1),
+      'الاسم الرباعي واللقب': name,
+      'اسم المدرسة الجديدة': document.getElementById('m2-school').value,
+      'التحصيل الدراسي': document.getElementById('m2-edu').value,
+    };
+    if(editIdx[2]!==null) currentTabIdx = tabs[2].indexOf(filtered[2][editIdx[2]]);
+  } else {
+    const oldp = document.getElementById('m3-old').value.trim();
+    const newp = document.getElementById('m3-new').value.trim();
+    if(!oldp||!newp) { showToast('يرجى إدخال أسماء الأشخاص', true); return; }
+    nameVal = newp;
+    phoneVal = document.getElementById('m3-phone').value.trim();
+    nameFields = ['الشخص الجديد', 'الشخص المراد استبداله'];
+    phoneField = 'رقم الهاتف';
+    rec = {
+      'ت': editIdx[3]!==null ? filtered[3][editIdx[3]]['ت'] : String(tabs[3].length+1),
+      'الشخص المراد استبداله': oldp,
+      'الشخص الجديد': newp,
+      'اسم الام': document.getElementById('m3-mom').value,
+      'الجنس': document.getElementById('m3-gender').value,
+      'التولد': document.getElementById('m3-born').value,
+      'الشهادة': document.getElementById('m3-cert').value,
+      'الاختصاص': document.getElementById('m3-spec').value,
+      'الاختصاص الدقيق': document.getElementById('m3-specx').value,
+      'القضاء': document.getElementById('m3-qada').value,
+      'الناحية': document.getElementById('m3-nahia').value,
+      'المنطقة': document.getElementById('m3-area').value,
+      'رقم البطاقة الوطنية': document.getElementById('m3-nid').value,
+      'الحالة الزوجية': document.getElementById('m3-marital').value,
+      'اسم الزوجة': document.getElementById('m3-wife').value,
+      'رقم الهاتف': phoneVal,
+    };
+    if(editIdx[3]!==null) currentTabIdx = tabs[3].indexOf(filtered[3][editIdx[3]]);
+  }
+
+  const doSave = () => {
+    if(editIdx[n]!==null) {
+      const mainIdx = tabs[n].indexOf(filtered[n][editIdx[n]]);
+      if(mainIdx>=0) tabs[n][mainIdx] = rec;
+      filtered[n][editIdx[n]] = rec;
+      showToast('تم تحديث السجل بنجاح ✅');
+    markUnsaved();
+    } else {
+      tabs[n].push(rec);
+      filtered[n] = [...tabs[n]];
+      showToast('تم إضافة السجل بنجاح ✅');
+      markUnsaved();
+    }
+    closeModal(n);
+    renderTable(n);
+    updateBadges();
+    updateStats();
+    saveToStorage();
+  };
+
+  // Only check duplicates on ADD (not edit, unless data changed)
+  const dupes = checkDuplicate(n, nameFields, phoneField, nameVal, phoneVal, currentTabIdx);
+  if (dupes.length > 0) {
+    showDuplicateWarning(dupes, doSave);
+  } else {
+    doSave();
+  }
+}
+
+// DELETE
+function askDelete(n, idx) {
+  deleteTarget = idx;
+  deleteTab = n;
+  document.getElementById('confirmDlg').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmDlg').classList.remove('open');
+  deleteTarget = null; deleteTab = null;
+}
+
+function confirmDelete() {
+  const n = deleteTab;
+  const rec = filtered[n][deleteTarget];
+  const mainIdx = tabs[n].indexOf(rec);
+  if(mainIdx>=0) tabs[n].splice(mainIdx,1);
+  filtered[n].splice(deleteTarget,1);
+  closeConfirm();
+  if((pages[n]-1)*PAGE_SIZE >= filtered[n].length && pages[n]>1) pages[n]--;
+  renderTable(n);
+  updateBadges();
+  updateStats();
+  showToast('تم حذف السجل 🗑️');
+  markUnsaved();
+}
+
+
+// EXPORT TO EXCEL
+function exportCSV(n) {
+  const allData = tabs[n];
+  if (!allData || !allData.length) { showToast('لا توجد بيانات للتصدير', true); return; }
+  if (typeof XLSX === 'undefined') {
+    showToast('جاري تحميل مكتبة التصدير، أعد المحاولة بعد ثانية...', true);
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => showToast('جاهز! اضغط تصدير مرة ثانية');
+    document.head.appendChild(s);
+    return;
+  }
+
+  // تصدير كل السجلات التي فيها اسم
+  const data = allData.filter(r => {
+    const name = r['الاسم الرباعي واللقب'] || r['الشخص الجديد'] || r['الشخص المراد استبداله'] || '';
+    return String(name).trim() !== '';
+  });
+  if (!data.length) { showToast('لا توجد بيانات للتصدير', true); return; }
+
+  const cfg = [
+    null,
+    { title:'امر اداري / تنسيب عقد',          fname:'بيانات_الامر_الاداري' },
+    { title:'تغيير التنسيب',                   fname:'تغيير_التنسيب'        },
+    { title:'حذف واستبدال موقع مختار الشامي', fname:'الحذف_والاستبدال'     },
+  ];
+  const c = cfg[n];
+
+  // للتاب الأول: تصدير 4 أعمدة فقط
+  const keys = n === 1
+    ? ['ت', 'الاسم الرباعي واللقب', 'رقم الهاتف', 'السرية الحالية', 'المعرف']
+    : Object.keys(data[0]).filter(k => k !== 'الفصيل الحالي');
+
+  const exportDate = new Date().toLocaleDateString('ar-IQ', { year:'numeric', month:'long', day:'numeric' });
+
+  // بناء البيانات
+  const aoa = [];
+  aoa.push([c.title]);
+  aoa.push(['إجمالي السجلات: ' + data.length + '     |     تاريخ التصدير: ' + exportDate]);
+  aoa.push(Array(keys.length).fill(''));
+  aoa.push(keys);
+  data.forEach(r => aoa.push(keys.map(k => (r[k] != null && r[k] !== undefined) ? String(r[k]) : '')));
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+  // عرض الأعمدة فقط (بدون أنماط - لضمان التصدير مع البيانات الكبيرة)
+  ws['!cols'] = keys.map(k => {
+    const max = Math.max(k.length, ...data.slice(0, 50).map(r => String(r[k]||'').length));
+    return { wch: Math.min(Math.max(max + 2, 10), 35) };
+  });
+
+  ws['!rows'] = [{ hpt:32 }, { hpt:16 }, { hpt:4 }, { hpt:22 }];
+
+  const L = keys.length - 1;
+  ws['!merges'] = [
+    { s:{r:0,c:0}, e:{r:0,c:L} },
+    { s:{r:1,c:0}, e:{r:1,c:L} },
+    { s:{r:2,c:0}, e:{r:2,c:L} },
+  ];
+
+  ws['!views'] = [{ rightToLeft: true }];
+
+  const wb = XLSX.utils.book_new();
+  wb.Props = { Title: c.title, Author: 'نظام إدارة البيانات' };
+  XLSX.utils.book_append_sheet(wb, ws, c.title.substring(0, 31));
+
+  try {
+    // تصدير بدون cellStyles لضمان نجاح البيانات الكبيرة
+    const out = XLSX.write(wb, { bookType:'xlsx', type:'array', cellStyles: false });
+    const blob = new Blob([out], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = c.fname + '_' + new Date().toLocaleDateString('en-CA') + '.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => { document.body.removeChild(link); URL.revokeObjectURL(link.href); }, 200);
+    showToast('تم تصدير ' + data.length + ' سجل بنجاح 📥');
+  } catch(err) {
+    console.error('Export error:', err);
+    showToast('خطأ في التصدير: ' + err.message, true);
+  }
+}
+
+// TOAST
+function showToast(msg, isErr=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr?' error':'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{
+  if(e.target===m) m.classList.remove('open');
+}));
+
+init();
+</script>
+</body>
+</html>
